@@ -1,0 +1,30 @@
+from src.core.base_main import BaseMain
+
+class SabsaCore(BaseMain):
+    
+    def __init__(self, name):
+        super().__init__(name)
+
+    def resources_attentions(self) -> list:
+        return [
+            {"system": "sabsa_solben", "filename": "attentions/unix_sabsa/solben_sabsa_attentions_2024.parquet"}
+        ]
+    
+    def resources_invoices(self) -> list:
+        return [
+            {"system": "sabsa_solben", "filename": "invoices/unix_sabsa/solben_sabsa_invoices_2024.parquet"}
+        ]
+
+    def systems(self) -> list:
+        return [
+            {"name": "silux_sabsa"},
+            {"name": "unix_sabsa", "load_dataframes": True}
+        ]
+    
+    def execute(self):
+        self.validate_attention(self.resources_attentions(), self.systems())
+        self.validate_invoices(self.resources_invoices(), self.systems())
+
+if __name__ == "__main__":
+    sabsa_core = SabsaCore("sabsa_dev")
+    sabsa_core.execute()
