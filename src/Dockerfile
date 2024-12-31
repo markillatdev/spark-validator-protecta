@@ -1,31 +1,74 @@
-# Usa la imagen base oficial de Spark con soporte para PySpark
-FROM bitnami/spark:3.5.1
+# Base image
+FROM ubuntu:20.04
 
-# Cambiar al usuario root para tener permisos adecuados
+# Cambiar al usuario root para permisos adecuados
 USER root
 
-# Crear el directorio de apt y limpiar la caché
-RUN apt-get update && apt-get install -y python3-pip curl wget && apt-get clean
+# Configurar las variables de entorno para evitar prompts interactivos
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Instalar PySpark y otras dependencias de Python
-RUN pip3 install py4j
-RUN pip3 install pyspark
+# Instalar dependencias necesarias
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    software-properties-common openjdk-11-jdk wget tar python3 python3-pip procps && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Configurar JAVA_HOME para que Spark lo encuentre
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Descargar e instalar Apache Spark
+ENV SPARK_VERSION=3.5.3
+RUN wget https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz \
+    && tar -xzf spark-$SPARK_VERSION-bin-hadoop3.tgz -C /opt \
+    && ln -s /opt/spark-$SPARK_VERSION-bin-hadoop3 /opt/spark \
+    && rm spark-$SPARK_VERSION-bin-hadoop3.tgz
 
 # Descargar el conector JDBC de MySQL y moverlo al directorio de Spark
-RUN wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-8.0.30.tar.gz -P /tmp/ && \
-    tar -xvzf /tmp/mysql-connector-java-8.0.30.tar.gz -C /tmp/ && \
-    mv /tmp/mysql-connector-java-8.0.30/mysql-connector-java-8.0.30.jar /opt/bitnami/spark/jars/ && \
+RUN wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-8.0.29.tar.gz -P /tmp/ && \
+    tar -xvzf /tmp/mysql-connector-java-8.0.29.tar.gz -C /tmp/ && \
+    mv /tmp/mysql-connector-java-8.0.29/mysql-connector-java-8.0.29.jar /opt/spark/jars/ && \
     rm -rf /tmp/*
 
-# Establecer variables de entorno para Python
+# Configurar variables de entorno para Spark
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$SPARK_HOME/bin:$PATH
+ENV SPARK_LOCAL_DIRS=/opt/spark/work
+ENV SPARK_CONF_DIR=/opt/spark/conf
+
+# Descargar e instalar Hadoop (Versión 2.7.3)
+ENV HADOOP_VERSION=2.7.3
+RUN wget http://archive.apache.org/dist/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz -q -O ./hadoop-$HADOOP_VERSION.tar.gz && \
+    tar -xvzf ./hadoop-$HADOOP_VERSION.tar.gz && \
+    rm -rf ./hadoop-$HADOOP_VERSION.tar.gz
+
+# Configurar variables de entorno para Hadoop
+ENV HADOOP_HOME=/opt/hadoop-$HADOOP_VERSION
+ENV HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+ENV PATH=$PATH:$HADOOP_HOME/bin
+
+# Configurar variables de entorno para Python
 ENV PYSPARK_PYTHON=python3
 
-# Establece el directorio de trabajo
-WORKDIR /app
+# Instalar PySpark, PyMySQL y dotenv
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install pyspark pymysql python-dotenv
 
-# Copiar scripts a la imagen
-COPY spark/spark-docker/validate_invoice_duplicate_all.py /app/validate_invoice_duplicate.py
-COPY spark/spark-docker/validate_attention_import_duplicate.py /app/validate_attention_import_duplicate.py
+# Crear el directorio de trabajo de Spark y establecer permisos
+RUN mkdir -p /opt/spark/work && chown -R 1001:1001 /opt/spark
 
-# Volver al usuario predeterminado de Spark para continuar con la ejecución de Spark
+# Establecer el directorio de trabajo
+WORKDIR /src
+
+# Copiar toda la carpeta src al directorio de trabajo en el contenedor
+COPY . /src
+
+# Establecer la variable de entorno STORAGE_PATH
+ENV STORAGE_PATH=/src/data
+
+# Exponer los puertos necesarios
+EXPOSE 8080 7077 4040
+
+# Volver al usuario predeterminado para ejecutar Spark
 USER 1001

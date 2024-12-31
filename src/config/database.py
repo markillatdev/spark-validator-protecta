@@ -42,11 +42,11 @@ DATABASE_CONFIG = {
 }
 
 PARQUET_ATTENTIONS_PATHS = {
-    "unix_sabsa": "/home/markillat/Documentos/almacenamiento/attentions/unix_sabsa/*.parquet",
-    "unix_cobertura": "/home/markillat/Documentos/almacenamiento/attentions/unix_cobertura/*.parquet",
+    "unix_sabsa": f'{os.getenv("STORAGE_PATH")}/attentions/unix_sabsa/*.parquet',
+    "unix_cobertura": f'{os.getenv("STORAGE_PATH")}/attentions/unix_cobertura/*.parquet',
 }
 
 PARQUET_INVOICES_PATHS = {
-    "unix_sabsa": "/home/markillat/Documentos/almacenamiento/invoices/unix_sabsa/*.parquet",
-    "unix_cobertura": "/home/markillat/Documentos/almacenamiento/invoices/unix_cobertura/*.parquet",
+    "unix_sabsa": f'{os.getenv("STORAGE_PATH")}/invoices/unix_sabsa/*.parquet',
+    "unix_cobertura": f'{os.getenv("STORAGE_PATH")}/invoices/unix_cobertura/*.parquet',
 }

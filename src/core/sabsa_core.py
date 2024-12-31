@@ -25,6 +25,6 @@ class SabsaCore(BaseMain):
         self.validate_attention(self.resources_attentions(), self.systems())
         self.validate_invoices(self.resources_invoices(), self.systems())
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     sabsa_core = SabsaCore("sabsa_dev")
     sabsa_core.execute()

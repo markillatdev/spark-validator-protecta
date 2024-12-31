@@ -3,7 +3,7 @@ import glob
 import os
 
 # Directorio donde están los archivos CSV
-csv_directory = "/home/markillat/Documentos/almacenamiento/duplicados_all.csv"
+csv_directory = f"{os.getenv("STORAGE_PATH")}/duplicados_all.csv"
 
 # Patrón para buscar los archivos CSV
 csv_files = glob.glob(os.path.join(csv_directory, "*.csv"))
@@ -22,7 +22,7 @@ if dataframes:
     combined_df = pd.concat(dataframes, ignore_index=True)
 
     # Guardar el DataFrame combinado en un archivo Excel
-    excel_file_path = "/home/markillat/Documentos/almacenamiento/duplicados_all.xlsx"
+    excel_file_path = f"{os.getenv("STORAGE_PATH")}/duplicados_all.xlsx"
     combined_df.to_excel(excel_file_path, index=False, engine='openpyxl')
     print(f"Archivo Excel guardado en: {excel_file_path}")
 else:

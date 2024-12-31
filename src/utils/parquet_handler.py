@@ -1,16 +1,12 @@
-from src.config.database import DATABASE_CONFIG
+from src.config.db_connection import read_table_from_db
+import os
 
 def load_or_create_parquet(spark, db_table, filename, system):
+    storage_path = os.getenv("STORAGE_PATH")
+    parquet_path = os.path.join(storage_path, filename)
     try:
-        file_parquet = spark.read.parquet(f"/home/markillat/Documentos/almacenamiento/{filename}")
+        file_parquet = spark.read.parquet(parquet_path)
     except Exception as e:
         print(f"Archivos Parquet no encontrados, cargando datos desde la base de datos de {system}...")
-        config = DATABASE_CONFIG.get(system)
-        file_parquet = spark.read.format("jdbc").options(
-            url=config['url'],
-            driver="com.mysql.cj.jdbc.Driver",
-            dbtable=db_table,
-            user=config['user'],
-            password=config['password']
-        ).load()
-        file_parquet.write.parquet(f"/home/markillat/Documentos/almacenamiento/{filename}")
+        file_parquet = read_table_from_db(spark, db_table, system)
+        file_parquet.write.parquet(parquet_path)
