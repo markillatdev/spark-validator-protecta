@@ -1,4 +1,4 @@
-from src.utils.queries_handler import (
+from utils.queries_handler import (
     update_factura,
     update_factura_unique,
     update_spark_processing)

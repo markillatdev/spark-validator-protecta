@@ -1,4 +1,4 @@
-from src.core.base_main import BaseMain
+from core.base_main import BaseMain
 
 class SabsaCore(BaseMain):
     
@@ -17,7 +17,7 @@ class SabsaCore(BaseMain):
 
     def systems(self) -> list:
         return [
-            {"name": "silux_sabsa"},
+            {"name": "sabsa_dev"},
             {"name": "unix_sabsa", "load_dataframes": True}
         ]
     

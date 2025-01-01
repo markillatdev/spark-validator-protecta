@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
         "./company/config"
-    ]
+    ],
+    "github.copilot.chat.scopeSelection": false
 }

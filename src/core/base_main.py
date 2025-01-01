@@ -1,10 +1,10 @@
-from src.config.spark_config import create_spark_session
-from src.config.db_connection import create_db_connection
-from src.utils.parquet_handler import load_or_create_parquet
-from src.handlers.attention_duplicate_handler import AttentionDuplicateHandler
-from src.handlers.invoice_duplicate_handler import InvoiceDuplicateHandler
-from dotenv import load_dotenv
-from src.utils.queries_handler import (
+from config.spark_config import create_spark_session
+from config.db_connection import create_db_connection
+from utils.parquet_handler import load_or_create_parquet
+from handlers.attention_duplicate_handler import AttentionDuplicateHandler
+from handlers.invoice_duplicate_handler import InvoiceDuplicateHandler
+from dotenv import load_dotenv # type: ignore
+from utils.queries_handler import (
     db_table_liquidacion_ordenes, 
     db_table_liquidacion_facturas
 )

@@ -1,6 +1,6 @@
-import pymysql # type: ignore
-from src.config.database import DATABASE_CONFIG
-from pyspark.sql import DataFrame
+import pymysql
+from config.database import DATABASE_CONFIG
+from pyspark.sql import DataFrame 
 
 def create_db_connection(system):
     config = DATABASE_CONFIG.get(system)

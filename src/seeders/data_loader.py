@@ -1,6 +1,6 @@
-from src.config.spark_config import create_spark_session
-from src.utils.parquet_handler import load_or_create_parquet
-from dotenv import load_dotenv
+from config.spark_config import create_spark_session
+from utils.parquet_handler import load_or_create_parquet
+from dotenv import load_dotenv # type: ignore
 load_dotenv()
 
 def load_resources(year, db_table, resource_type):

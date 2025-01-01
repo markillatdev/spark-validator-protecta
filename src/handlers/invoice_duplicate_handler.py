@@ -1,8 +1,8 @@
-from pyspark.sql.functions import col
-from src.handlers.update_handler import InvoiceUpdate
-from src.config.db_connection import read_table_from_db
-from src.config.database import PARQUET_INVOICES_PATHS
-from src.utils.queries_handler import (
+from pyspark.sql.functions import col # type: ignore
+from handlers.update_handler import InvoiceUpdate
+from config.db_connection import read_table_from_db
+from config.database import PARQUET_INVOICES_PATHS
+from utils.queries_handler import (
     db_table_medden_facturas,
     db_table_validacion_facturas,
     db_table_validacion_facturas_with_ids

@@ -1,8 +1,8 @@
-from pyspark.sql.functions import col
-from src.config.database import PARQUET_ATTENTIONS_PATHS
-from src.config.db_connection import read_table_from_db
-from src.handlers.update_handler import InvoiceUpdate
-from src.utils.queries_handler import (
+from pyspark.sql.functions import col # type: ignore
+from config.database import PARQUET_ATTENTIONS_PATHS
+from config.db_connection import read_table_from_db
+from handlers.update_handler import InvoiceUpdate
+from utils.queries_handler import (
     db_table_medden_ordenes,
     db_table_validacion_ordenes,
     db_table_validacion_ordenes_with_ids

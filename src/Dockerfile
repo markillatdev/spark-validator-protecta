@@ -37,17 +37,6 @@ ENV PATH=$SPARK_HOME/bin:$PATH
 ENV SPARK_LOCAL_DIRS=/opt/spark/work
 ENV SPARK_CONF_DIR=/opt/spark/conf
 
-# Descargar e instalar Hadoop (Versión 2.7.3)
-ENV HADOOP_VERSION=2.7.3
-RUN wget http://archive.apache.org/dist/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz -q -O ./hadoop-$HADOOP_VERSION.tar.gz && \
-    tar -xvzf ./hadoop-$HADOOP_VERSION.tar.gz && \
-    rm -rf ./hadoop-$HADOOP_VERSION.tar.gz
-
-# Configurar variables de entorno para Hadoop
-ENV HADOOP_HOME=/opt/hadoop-$HADOOP_VERSION
-ENV HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
-ENV PATH=$PATH:$HADOOP_HOME/bin
-
 # Configurar variables de entorno para Python
 ENV PYSPARK_PYTHON=python3
 
@@ -56,7 +45,7 @@ RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install pyspark pymysql python-dotenv
 
 # Crear el directorio de trabajo de Spark y establecer permisos
-RUN mkdir -p /opt/spark/work && chown -R 1001:1001 /opt/spark
+#RUN mkdir -p /opt/spark/work && chown -R 1001:1001 /opt/spark
 
 # Establecer el directorio de trabajo
 WORKDIR /src
@@ -71,4 +60,4 @@ ENV STORAGE_PATH=/src/data
 EXPOSE 8080 7077 4040
 
 # Volver al usuario predeterminado para ejecutar Spark
-USER 1001
+USER root

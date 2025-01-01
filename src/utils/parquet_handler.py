@@ -1,4 +1,4 @@
-from src.config.db_connection import read_table_from_db
+from config.db_connection import read_table_from_db
 import os
 
 def load_or_create_parquet(spark, db_table, filename, system):

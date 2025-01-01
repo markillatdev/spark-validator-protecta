@@ -1,4 +1,4 @@
-from src.core.base_main import BaseMain
+from core.base_main import BaseMain
 
 class CoberturaCore(BaseMain):
     

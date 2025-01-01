@@ -1,9 +1,9 @@
-from pyspark.sql.functions import col
-from src.config.database import PARQUET_ATTENTIONS_PATHS
-from src.config.db_connection import create_db_connection, read_table_from_db
-from src.config.spark_config import create_spark_session
-from src.handlers.update_handler import InvoiceUpdate
-from src.utils.queries_handler import (
+from pyspark.sql.functions import col # type: ignore
+from config.database import PARQUET_ATTENTIONS_PATHS
+from config.db_connection import create_db_connection, read_table_from_db
+from config.spark_config import create_spark_session
+from handlers.update_handler import InvoiceUpdate
+from utils.queries_handler import (
     db_table_liquidacion_ordenes_silux,
     db_table_liquidacion_ordenes_silux_with_ids
 )
