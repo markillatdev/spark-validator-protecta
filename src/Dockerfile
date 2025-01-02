@@ -44,8 +44,8 @@ ENV PYSPARK_PYTHON=python3
 RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install pyspark pymysql python-dotenv
 
-# Crear el directorio de trabajo de Spark y establecer permisos
-#RUN mkdir -p /opt/spark/work && chown -R 1001:1001 /opt/spark
+# Instalar utilidades de red
+RUN apt update && apt install -y iputils-ping    
 
 # Establecer el directorio de trabajo
 WORKDIR /src

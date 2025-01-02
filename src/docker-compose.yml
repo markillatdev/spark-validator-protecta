@@ -1,11 +1,19 @@
 version: '3.8'
 
+networks:
+    spark_network:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: "172.19.0.0/16"
 services:
     spark:
         build: 
             context: .
             dockerfile: Dockerfile
-        network_mode: "host"
+        networks: 
+            - spark_network
         environment:
             - SPARK_MODE=master
             - SPARK_RPC_AUTHENTICATION_ENABLED=no
@@ -30,7 +38,8 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile
-        network_mode: "host"            
+        networks: 
+            - spark_network
         environment:
             - SPARK_MODE=worker
             - SPARK_MASTER_URL=spark://spark:7077
@@ -58,7 +67,8 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile
-        network_mode: "host"            
+        networks: 
+            - spark_network
         environment:
             - SPARK_MODE=worker
             - SPARK_MASTER_URL=spark://spark:7077
@@ -86,7 +96,8 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile
-        network_mode: "host"            
+        networks: 
+            - spark_network
         environment:
             - SPARK_MODE=worker
             - SPARK_MASTER_URL=spark://spark:7077
