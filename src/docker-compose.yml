@@ -1,16 +1,11 @@
 version: '3.8'
 
-networks:
-    spark_network:
-        driver: bridge
-
 services:
     spark:
         build: 
             context: .
             dockerfile: Dockerfile
-        networks: 
-            - spark_network
+        network_mode: "host"
         environment:
             - SPARK_MODE=master
             - SPARK_RPC_AUTHENTICATION_ENABLED=no
@@ -26,7 +21,6 @@ services:
             - '8080:8080'
             - '7077:7077'
             - '4040:4040'
-            - "3307:3306"            
         volumes:
             - .:/src
         command: 
@@ -36,8 +30,7 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile
-        networks: 
-            - spark_network
+        network_mode: "host"            
         environment:
             - SPARK_MODE=worker
             - SPARK_MASTER_URL=spark://spark:7077
@@ -56,7 +49,6 @@ services:
             - spark
         ports:
             - '8081:8081'
-            - "3308:3306"
         volumes:
             - .:/src
         command: 
@@ -66,8 +58,7 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile
-        networks: 
-            - spark_network
+        network_mode: "host"            
         environment:
             - SPARK_MODE=worker
             - SPARK_MASTER_URL=spark://spark:7077
@@ -86,7 +77,6 @@ services:
             - spark
         ports:
             - '8082:8081'
-            - "3309:3306"            
         volumes:
             - .:/src
         command: 
@@ -96,8 +86,7 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile
-        networks: 
-            - spark_network
+        network_mode: "host"            
         environment:
             - SPARK_MODE=worker
             - SPARK_MASTER_URL=spark://spark:7077
@@ -116,7 +105,6 @@ services:
             - spark
         ports:
             - '8083:8081'
-            - "3340:3306"            
         volumes:
             - .:/src
         command: 

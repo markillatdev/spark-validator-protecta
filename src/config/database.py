@@ -20,14 +20,12 @@ DATABASE_CONFIG = {
         "database": os.getenv("DB_DATABASE_CM")
     },
     "sabsa_dev": {
-        #"url": os.getenv("DB_URL", "jdbc:mysql://localhost:3307/liquidaciones_test_pro_sabsa"),
-        "url": os.getenv("DB_URL", "jdbc:mysql://localhost:3306/db_liquidaciones_test_2025"),
+        "url": os.getenv("DB_URL", "jdbc:mysql://localhost:3307/liquidaciones_test_pro_sabsa"),
         "host": os.getenv("DB_HOST", "localhost"),
-        "port": os.getenv("DB_PORT", 3306),
+        "port": os.getenv("DB_PORT", 3307),
         "user": os.getenv("DB_USER", "root"),
         "password": os.getenv("DB_PASSWORD", ""),
-        #"database": os.getenv("DB_NAME", "liquidaciones_test_pro_sabsa"),
-        "database": os.getenv("DB_NAME", "db_liquidaciones_test_2025")
+        "database": os.getenv("DB_NAME", "liquidaciones_test_pro_sabsa")
     },
     "sabsa_solben": {
         "url": os.getenv("DB_URL_SOLBEN_SABSA"),
