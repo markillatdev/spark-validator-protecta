@@ -15,8 +15,8 @@ class SystemService:
 
     def operations_attention(self):
         try:
-            if self.system ==  Constants.SYSTEM_SABSA:
-                sabsa = SabsaCore(self.system)
+            if self.system == Constants.SYSTEM_SABSA:
+                sabsa = SabsaCore("sabsa_dev")
                 sabsa.execute_attentions()
             elif self.system == Constants.SYSTEM_COBERTURA:
                 cobertura = CoberturaCore(self.system)

@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Instalar dependencias necesarias
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    software-properties-common openjdk-11-jdk wget tar python3 python3-pip procps && \
+    software-properties-common openjdk-11-jdk wget tar python3 python3-pip procps iputils-ping supervisor&& \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -44,9 +44,6 @@ ENV PYSPARK_PYTHON=python3
 RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install pyspark pymysql python-dotenv fastapi uvicorn pydantic python-jose
 
-# Instalar utilidades de red
-RUN apt update && apt install -y iputils-ping    
-
 # Establecer el directorio de trabajo
 WORKDIR /src
 
@@ -57,9 +54,10 @@ COPY . /src
 ENV STORAGE_PATH=/src/repositories
 
 # Exponer los puertos necesarios
-EXPOSE 8080 7077 4040
+EXPOSE 8080 7077 4040 8000
 
-# Volver al usuario predeterminado para ejecutar Spark
-#USER root
+#Configuracion de supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--reload"]
+#Ejecucion de supervisor varios procesos
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

@@ -8,9 +8,14 @@ class SystemMiddleware:
             Constants.SYSTEM_SABSA,
             Constants.SYSTEM_COBERTURA
         ]
+        self.swagger_paths = ["/docs", "/openapi.json", "/redoc"]
 
     async def __call__(self, request: Request, call_next):
         try:
+
+            if any(request.url.path.startswith(path) for path in self.swagger_paths):
+                return await call_next(request)
+    
             system = request.headers.get("system")
 
             if system not in self.allowed_systems:
