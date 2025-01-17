@@ -21,10 +21,8 @@ class SabsaCore(BaseMain):
             {"name": "unix_sabsa", "load_dataframes": True}
         ]
     
-    def execute(self):
+    def execute_attentions(self):
         self.validate_attention(self.resources_attentions(), self.systems())
-        self.validate_invoices(self.resources_invoices(), self.systems())
 
-if __name__ == "__main__":    
-    sabsa_core = SabsaCore("sabsa_dev")
-    sabsa_core.execute()
+    def execute_invoices(self):
+        self.validate_invoices(self.resources_invoices(), self.systems())

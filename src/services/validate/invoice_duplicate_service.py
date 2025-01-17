@@ -1,5 +1,5 @@
 from pyspark.sql.functions import col # type: ignore
-from handlers.update_handler import InvoiceUpdate
+from services.validate.update_service import InvoiceUpdate
 from config.db_connection import read_table_from_db
 from config.database import PARQUET_INVOICES_PATHS
 from utils.queries_handler import (

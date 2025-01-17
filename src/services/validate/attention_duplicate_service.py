@@ -1,7 +1,7 @@
 from pyspark.sql.functions import col # type: ignore
 from config.database import PARQUET_ATTENTIONS_PATHS
 from config.db_connection import read_table_from_db
-from handlers.update_handler import InvoiceUpdate
+from services.validate.update_service import InvoiceUpdate
 from utils.queries_handler import (
     db_table_medden_ordenes,
     db_table_validacion_ordenes,

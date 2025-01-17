@@ -40,9 +40,9 @@ ENV SPARK_CONF_DIR=/opt/spark/conf
 # Configurar variables de entorno para Python
 ENV PYSPARK_PYTHON=python3
 
-# Instalar PySpark, PyMySQL y dotenv
+# Instalar PySpark, PyMySQL, dotenv, Fastapi, uvicorn y pydantic
 RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install pyspark pymysql python-dotenv
+    python3 -m pip install pyspark pymysql python-dotenv fastapi uvicorn pydantic python-jose
 
 # Instalar utilidades de red
 RUN apt update && apt install -y iputils-ping    
@@ -54,10 +54,12 @@ WORKDIR /src
 COPY . /src
 
 # Establecer la variable de entorno STORAGE_PATH
-ENV STORAGE_PATH=/src/data
+ENV STORAGE_PATH=/src/repositories
 
 # Exponer los puertos necesarios
 EXPOSE 8080 7077 4040
 
 # Volver al usuario predeterminado para ejecutar Spark
-USER root
+#USER root
+
+CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--reload"]

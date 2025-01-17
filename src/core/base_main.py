@@ -1,8 +1,8 @@
 from config.spark_config import create_spark_session
 from config.db_connection import create_db_connection
 from utils.parquet_handler import load_or_create_parquet
-from handlers.attention_duplicate_handler import AttentionDuplicateHandler
-from handlers.invoice_duplicate_handler import InvoiceDuplicateHandler
+from services.validate.attention_duplicate_service import AttentionDuplicateHandler
+from services.validate.invoice_duplicate_service import InvoiceDuplicateHandler
 from dotenv import load_dotenv # type: ignore
 from utils.queries_handler import (
     db_table_liquidacion_ordenes, 
