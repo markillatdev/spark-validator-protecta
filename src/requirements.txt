@@ -1,2 +1,7 @@
-fastapi
-uvicorn
+pyspark 
+pymysql 
+python-dotenv 
+fastapi 
+uvicorn 
+pydantic 
+python-jose

@@ -40,9 +40,12 @@ ENV SPARK_CONF_DIR=/opt/spark/conf
 # Configurar variables de entorno para Python
 ENV PYSPARK_PYTHON=python3
 
+# Copia el archivo requirements.txt al contenedor
+COPY requirements.txt .
+
 # Instalar PySpark, PyMySQL, dotenv, Fastapi, uvicorn y pydantic
 RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install pyspark pymysql python-dotenv fastapi uvicorn pydantic python-jose
+    python3 -m pip install -r requirements.txt
 
 # Establecer el directorio de trabajo
 WORKDIR /src
