@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 class responseSchema(BaseModel):
@@ -10,7 +11,7 @@ class responseSchema(BaseModel):
             }
         }
 
-class JwtEsquema(BaseModel):
+class JwtSchema(BaseModel):
     access_token: str
 
     class Config:
@@ -20,12 +21,22 @@ class JwtEsquema(BaseModel):
             }
         }
 
-class ApiKeyEsquema(BaseModel):
+class ApiKeySchema(BaseModel):
     apikey: str
 
     class Config:
         schema_extra = {
             "ejemplo": {
                 "apikey": "************"
+            }
+        }
+
+class InvoiceSchema(BaseModel):
+    invoiceIds: List[int]
+
+    class Config:
+        schema_extra = {
+            "ejemplo": {
+                "invoiceIds": [1, 2, 3, 4, 5, 6]
             }
         }

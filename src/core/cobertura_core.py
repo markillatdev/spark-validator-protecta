@@ -1,3 +1,4 @@
+from typing import List
 from core.base_main import BaseMain
 
 class CoberturaCore(BaseMain):
@@ -30,3 +31,6 @@ class CoberturaCore(BaseMain):
 
     def execute_invoices(self):
         self.validate_invoices(self.resources_invoices(), self.systems())
+
+    def execute_update_invoices(self, invoiceIds: List[int]):
+        self.update_invoices_unique(invoiceIds)

@@ -1,3 +1,4 @@
+from typing import List
 from utils.queries_handler import (
     update_factura,
     update_factura_unique,
@@ -25,21 +26,23 @@ class InvoiceUpdate:
             print(f"Error actualizando factura {factura_id}: {e}")
 
 
-    def update_invoices_unique(self, message):
-        cursor = self.connection.cursor()
+    def update_invoices_unique(self, message: str, invoiceIds: List[int]):
         try:
-            cursor.execute(update_factura_unique, (
-                message, 2, 2, 0, 0, 0, 0
-            ))
+            query = update_factura_unique(invoiceIds)
+            params = [message] + invoiceIds
+            cursor = self.connection.cursor()
+            cursor.execute(query, params)
             self.connection.commit()
         except Exception as e:
             print(f"Error actualizando: {e}")
 
 
-    def update_spark_processing(self):
+    def update_spark_processing(self, invoiceIds: List[int]):
         cursor = self.connection.cursor()
         try:
-            cursor.execute(update_spark_processing)
+            params = invoiceIds
+            cursor.execute(update_spark_processing(invoiceIds), params)
             self.connection.commit()
         except Exception as e:
             print(f"Error actualizando: {e}")
+            self.connection.rollback()

@@ -2,6 +2,7 @@ from fastapi import HTTPException, status, Request
 from jose import jwt
 import os
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
@@ -10,6 +11,8 @@ ALGORITHM = "HS256"
 
 def create_access_token(data: dict):
     to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=30)
+    to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def get_access_token(apiKey: str):
@@ -21,10 +24,10 @@ def get_access_token(apiKey: str):
 def verify_token(request: Request):
     authorization = request.headers.get("Authorization")
     if authorization is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No autenticado JWT")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No autenticado")
     else:
         try:
             token = authorization.split(" ")[1]
             return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         except:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No autenticado JWT")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No autenticado")

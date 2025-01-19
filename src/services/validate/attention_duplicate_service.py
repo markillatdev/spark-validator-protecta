@@ -1,3 +1,4 @@
+from typing import List
 from pyspark.sql.functions import col # type: ignore
 from config.database import PARQUET_ATTENTIONS_PATHS
 from config.db_connection import read_table_from_db
@@ -19,10 +20,10 @@ class AttentionDuplicateHandler:
         self.message = "Atencion duplicada"
     
 
-    def procesar_atenciones(self, systems_validate):
-        df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_ordenes, self.coreSystem)
-        df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_ordenes_with_ids, self.coreSystem)
-        self.invoice_updater.update_spark_processing()
+    def procesar_atenciones(self, systems_validate, invoiceIds: List[int]):
+        df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_ordenes(invoiceIds), self.coreSystem)
+        df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_ordenes_with_ids(invoiceIds), self.coreSystem)
+        self.invoice_updater.update_spark_processing(invoiceIds)
 
         for system in systems_validate:
 
@@ -48,7 +49,7 @@ class AttentionDuplicateHandler:
             )
 
             self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
-            df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_ordenes, self.coreSystem)
+            df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_ordenes(invoiceIds), self.coreSystem)
 
             if df_facturas_por_validar.count() == 0:
                 print("No hay facturas pendientes por procesar.")

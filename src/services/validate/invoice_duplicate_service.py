@@ -1,3 +1,4 @@
+from typing import List
 from pyspark.sql.functions import col # type: ignore
 from services.validate.update_service import InvoiceUpdate
 from config.db_connection import read_table_from_db
@@ -19,10 +20,10 @@ class InvoiceDuplicateHandler:
         self.message = "Factura duplicada"
     
 
-    def procesar_facturas(self, systems_validate):
-        df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_facturas, self.coreSystem)
-        df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_facturas_with_ids, self.coreSystem)
-        self.invoice_updater.update_spark_processing()
+    def procesar_facturas(self, systems_validate: List[str], invoiceIds: List[int]):
+        df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_facturas(invoiceIds), self.coreSystem)
+        df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_facturas_with_ids(invoiceIds), self.coreSystem)
+        self.invoice_updater.update_spark_processing(invoiceIds)
 
         for system in systems_validate:
 
@@ -48,13 +49,11 @@ class InvoiceDuplicateHandler:
             )
 
             self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
-            df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_facturas, self.coreSystem)
+            df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_facturas(invoiceIds), self.coreSystem)
 
             if df_facturas_por_validar.count() == 0:
                 print("No hay facturas pendientes por procesar.")
                 break
-        
-        self.invoice_updater.update_invoices_unique("Factura unica")
 
 
     def buscar_duplicados(self, df_facturas_filtradas, df_facturas_buscar, system):
