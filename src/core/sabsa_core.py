@@ -1,9 +1,10 @@
 from typing import List
 from core.base_main import BaseMain
+from utils.constants import Constants
 
 class SabsaCore(BaseMain):
     
-    def __init__(self, name):
+    def __init__(self, name: str):
         super().__init__(name)
 
     def resources_attentions(self) -> list:
@@ -18,7 +19,7 @@ class SabsaCore(BaseMain):
 
     def systems(self) -> list:
         return [
-            {"name": "sabsa_dev"},
+            {"name": Constants.SYSTEM_SILUX_SABSA},
             {"name": "unix_sabsa", "load_dataframes": True}
         ]
     

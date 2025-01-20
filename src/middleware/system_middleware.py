@@ -5,8 +5,8 @@ from utils.constants import Constants
 class SystemMiddleware:
     def __init__(self):
         self.allowed_systems = [
-            Constants.SYSTEM_SABSA,
-            Constants.SYSTEM_COBERTURA
+            Constants.SYSTEM_SILUX_SABSA,
+            Constants.SYSTEM_SILUX_COBERTURA
         ]
         self.swagger_paths = ["/docs", "/openapi.json", "/redoc"]
 

@@ -14,7 +14,7 @@ load_dotenv()
 
 class BaseMain:
 
-    def __init__(self, system):
+    def __init__(self, system: str):
         self.system = system
 
     def validate_attention(self, resources: List[str], systems_validate: List[str], invoiceIds: List[int]):

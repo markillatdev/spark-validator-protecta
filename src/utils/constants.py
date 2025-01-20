@@ -1,3 +1,4 @@
 class Constants:
-    SYSTEM_SABSA = "sabsa"
-    SYSTEM_COBERTURA = "cobertura"
+    SYSTEM_SILUX_SABSA = "silux_sabsa"
+    SYSTEM_SILUX_COBERTURA = "silux_cobertura"
+    SYSTEM_UNIX_SABSA = "unix_sabsa"

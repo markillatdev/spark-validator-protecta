@@ -2,7 +2,7 @@ import pymysql
 from config.database import DATABASE_CONFIG
 from pyspark.sql import DataFrame
 
-def create_db_connection(system):
+def create_db_connection(system: str):
     config = DATABASE_CONFIG.get(system)
     connection = pymysql.connect(
         host=config["host"],

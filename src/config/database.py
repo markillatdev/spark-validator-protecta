@@ -4,28 +4,20 @@ load_dotenv()
 
 DATABASE_CONFIG = {
     "silux_sabsa": {
-        "url": os.getenv("DB_URL_IUNIX_SABSA"),
-        "host": os.getenv("DB_HOST_SABSA"),
-        "port": os.getenv("DB_PORT_SABSA"),
-        "user": os.getenv("DB_USER_IUNIX_SABSA"),
-        "password": os.getenv("DB_PASSWORD_IUNIX_SABSA"),
-        "database": os.getenv("DB_DATABASE_SABSA")
+        "url": os.getenv("DB_URL_SILUX_SABSA"),
+        "host": os.getenv("DB_HOST_SILUX_SABSA"),
+        "port": int(os.getenv("DB_PORT_SILUX_SABSA")),
+        "user": os.getenv("DB_USER_SILUX_SABSA"),
+        "password": os.getenv("DB_PASSWORD_SILUX_SABSA"),
+        "database": os.getenv("DB_DATABASE_SILUX_SABSA")
     },
     "silux_cobertura": {
-        "url": os.getenv("DB_URL_IUNIX_CM"),
-        "host": os.getenv("DB_HOST_CM"),
-        "port": os.getenv("DB_PORT_CM"),
-        "user": os.getenv("DB_USER_IUNIX_CM"),
-        "password": os.getenv("DB_PASSWORD_IUNIX_CM"),
-        "database": os.getenv("DB_DATABASE_CM")
-    },
-    "sabsa_dev": {
-        "url": os.getenv("DB_URL", "jdbc:mysql://172.19.0.1:3307/liquidaciones_test_pro_sabsa"),
-        "host": os.getenv("DB_HOST", "172.19.0.1"),
-        "port": os.getenv("DB_PORT", 3307),
-        "user": os.getenv("DB_USER", "root"),
-        "password": os.getenv("DB_PASSWORD", ""),
-        "database": os.getenv("DB_NAME", "liquidaciones_test_pro_sabsa")
+        "url": os.getenv("DB_URL_SILUX_CM"),
+        "host": os.getenv("DB_HOST_SILUX_CM"),
+        "port": int(os.getenv("DB_PORT_SILUX_CM")),
+        "user": os.getenv("DB_USER_SILUX_CM"),
+        "password": os.getenv("DB_PASSWORD_SILUX_CM"),
+        "database": os.getenv("DB_DATABASE_SILUX_CM")
     },
     "sabsa_solben": {
         "url": os.getenv("DB_URL_SOLBEN_SABSA"),
