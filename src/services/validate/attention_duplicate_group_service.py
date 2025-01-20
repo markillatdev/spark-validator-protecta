@@ -3,6 +3,7 @@ from config.database import PARQUET_ATTENTIONS_PATHS
 from config.db_connection import create_db_connection, read_table_from_db
 from config.spark_config import create_spark_session
 from services.validate.update_service import InvoiceUpdate
+from utils.constants import Constants
 from utils.queries_handler import (
     db_table_liquidacion_ordenes_silux,
     db_table_liquidacion_ordenes_silux_with_ids
@@ -21,9 +22,9 @@ class AttentionDuplicateGroup:
 
     def procesar_atenciones(self):
         df_solben_sabsa = read_table_from_db(self.spark, db_table_liquidacion_ordenes_silux, self.coreSystem)
-        df_facturas_silux = read_table_from_db(self.spark, db_table_liquidacion_ordenes_silux_with_ids, "sabsa_dev")
+        df_facturas_silux = read_table_from_db(self.spark, db_table_liquidacion_ordenes_silux_with_ids, Constants.SYSTEM_SILUX_SABSA)
         self.invoice_updater.update_spark_processing()
-        path = PARQUET_ATTENTIONS_PATHS.get("unix_sabsa")
+        path = PARQUET_ATTENTIONS_PATHS.get(Constants.SYSTEM_UNIX_SABSA)
         df_antiguas = self.spark.read.parquet(path)
         filtered_df = df_antiguas.join(
             df_solben_sabsa.select("codigo_afiliado", "monto", "nro_solben", "ruc_proveedor").distinct(),
@@ -53,7 +54,7 @@ class AttentionDuplicateGroup:
             for factura in factura_lists:
                 try: 
                     factura_id = factura["factura_id"]
-                    self.invoice_updater.update_invoices_detected(self.message, factura_id, "unix_sabsa")
+                    self.invoice_updater.update_invoices_detected(self.message, factura_id, Constants.SYSTEM_UNIX_SABSA)
                     print(f"Factura {factura_id} actualizada con la observación: {self.message}")
                 except Exception as e:
                     print(f"Error al actualizar la factura {factura_id}: {e}")
@@ -61,6 +62,6 @@ class AttentionDuplicateGroup:
 
 if __name__ == "__main__":
     spark = create_spark_session()
-    connection = create_db_connection("sabsa_dev")
-    attention = AttentionDuplicateGroup(spark, connection, "sabsa_solben")
+    connection = create_db_connection(Constants.SYSTEM_SILUX_SABSA)
+    attention = AttentionDuplicateGroup(spark, connection, Constants.SYSTEM_SOLBEN_SABSA)
     attention.procesar_atenciones()

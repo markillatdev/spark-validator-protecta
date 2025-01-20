@@ -49,11 +49,6 @@ class InvoiceDuplicateHandler:
             )
 
             self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
-            df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_facturas(invoiceIds), self.coreSystem)
-
-            if df_facturas_por_validar.count() == 0:
-                print("No hay facturas pendientes por procesar.")
-                break
 
 
     def buscar_duplicados(self, df_facturas_filtradas, df_facturas_buscar, system):
@@ -74,6 +69,6 @@ class InvoiceDuplicateHandler:
                 print(f"Factura {factura_id} actualizada con la observación: {self.message}")
 
 
-    def load_dataframes(self, system):
+    def load_dataframes(self, system: str):
         path = PARQUET_INVOICES_PATHS.get(system)
         return self.spark.read.parquet(path) if path else None

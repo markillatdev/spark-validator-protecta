@@ -1,5 +1,6 @@
 from typing import List
 from core.base_main import BaseMain
+from utils.constants import Constants
 
 class CoberturaCore(BaseMain):
     
@@ -8,22 +9,22 @@ class CoberturaCore(BaseMain):
 
     def resources_attentions(self) -> list:
         return [
-            {"system": "sabsa_solben", "filename": "attentions/unix_sabsa/solben_sabsa_attentions_2024.parquet"},
-            {"system": "sabsa_cobertura", "filename": "attentions/unix_cobertura/solben_cobertura_attentions_2024.parquet"}
+            {"system": Constants.SYSTEM_SOLBEN_SABSA, "filename": "attentions/unix_sabsa/solben_sabsa_attentions_2024.parquet"},
+            {"system": Constants.SYSTEM_SOLBEN_COBERTURA, "filename": "attentions/unix_cobertura/solben_cobertura_attentions_2024.parquet"}
         ]
     
     def resources_invoices(self) -> list:
         return [
-            {"system": "sabsa_solben", "filename": "invoices/unix_sabsa/solben_sabsa_invoices_2024.parquet"},
-            {"system": "sabsa_cobertura", "filename": "invoices/unix_cobertura/solben_cobertura_invoices_2024.parquet"}
+            {"system": Constants.SYSTEM_SOLBEN_SABSA, "filename": "invoices/unix_sabsa/solben_sabsa_invoices_2024.parquet"},
+            {"system": Constants.SYSTEM_SOLBEN_COBERTURA, "filename": "invoices/unix_cobertura/solben_cobertura_invoices_2024.parquet"}
         ]
 
     def systems(self) -> list:
         return [
-            {"name": "silux_sabsa"},
-            {"name": "silux_cobertura"},
-            {"name": "unix_sabsa", "load_dataframes": True},
-            {"name": "unix_cobertura", "load_dataframes": True}
+            {"name": Constants.SYSTEM_SILUX_SABSA},
+            {"name": Constants.SYSTEM_SILUX_COBERTURA},
+            {"name": Constants.SYSTEM_UNIX_SABSA, "load_dataframes": True},
+            {"name": Constants.SYSTEM_UNIX_COBERTURA, "load_dataframes": True}
         ]
     
     def execute_attentions(self):

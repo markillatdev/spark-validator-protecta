@@ -9,18 +9,18 @@ class SabsaCore(BaseMain):
 
     def resources_attentions(self) -> list:
         return [
-            {"system": "sabsa_solben", "filename": "attentions/unix_sabsa/solben_sabsa_attentions_2024.parquet"}
+            {"system":Constants.SYSTEM_SOLBEN_SABSA, "filename": "attentions/unix_sabsa/solben_sabsa_attentions_2024.parquet"}
         ]
     
     def resources_invoices(self) -> list:
         return [
-            {"system": "sabsa_solben", "filename": "invoices/unix_sabsa/solben_sabsa_invoices_2024.parquet"}
+            {"system": Constants.SYSTEM_SOLBEN_SABSA, "filename": "invoices/unix_sabsa/solben_sabsa_invoices_2024.parquet"}
         ]
 
     def systems(self) -> list:
         return [
             {"name": Constants.SYSTEM_SILUX_SABSA},
-            {"name": "unix_sabsa", "load_dataframes": True}
+            {"name": Constants.SYSTEM_UNIX_SABSA, "load_dataframes": True}
         ]
     
     def execute_attentions(self, invoiceIds: List[int]):

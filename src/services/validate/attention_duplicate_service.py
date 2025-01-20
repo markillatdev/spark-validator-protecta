@@ -20,7 +20,7 @@ class AttentionDuplicateHandler:
         self.message = "Atencion duplicada"
     
 
-    def procesar_atenciones(self, systems_validate, invoiceIds: List[int]):
+    def procesar_atenciones(self, systems_validate: List[str], invoiceIds: List[int]):
         df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_ordenes(invoiceIds), self.coreSystem)
         df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_ordenes_with_ids(invoiceIds), self.coreSystem)
         self.invoice_updater.update_spark_processing(invoiceIds)
@@ -49,11 +49,6 @@ class AttentionDuplicateHandler:
             )
 
             self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
-            df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_ordenes(invoiceIds), self.coreSystem)
-
-            if df_facturas_por_validar.count() == 0:
-                print("No hay facturas pendientes por procesar.")
-                break
         
 
     def buscar_duplicados(self, df_facturas_filtradas, df_facturas_buscar, system):
@@ -78,6 +73,6 @@ class AttentionDuplicateHandler:
                 print(f"Factura {factura_id} actualizada con la observación: {self.message}")
 
 
-    def load_dataframes(self, system):
+    def load_dataframes(self, system: str):
         path = PARQUET_ATTENTIONS_PATHS.get(system)
         return self.spark.read.parquet(path) if path else None
