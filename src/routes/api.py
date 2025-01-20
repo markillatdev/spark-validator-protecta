@@ -1,6 +1,7 @@
 from fastapi import APIRouter, status, Request, Depends
 from schemas.schema import *
 from services.system_service import SystemService
+from services.loader.data_loader_service import DataFrameLoader
 from services.jwt_service import *
 
 router = APIRouter()
@@ -23,3 +24,8 @@ async def validateInternalAttentionDuplicateImport(schema: InvoiceSchema,request
 async def updateInvoiceUnique(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):
     service = SystemService(request.headers.get("system"))
     return service.operations_update_invoices(schema.invoiceIds)
+
+@router.post("/load-dataframe-to-database", status_code=status.HTTP_200_OK, response_model=responseSchema)
+async def loadDataFrameToDatabase(schema: DataFrameSchema, request: Request, token: str = Depends(verify_token)):
+    service = DataFrameLoader(request.headers.get("system"))
+    return service.load_data(schema.years)

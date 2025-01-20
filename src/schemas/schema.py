@@ -40,3 +40,14 @@ class InvoiceSchema(BaseModel):
                 "invoiceIds": [1, 2, 3, 4, 5, 6]
             }
         }
+
+
+class DataFrameSchema(BaseModel):
+    years: List[int]
+
+    class Config:
+        schema_extra = {
+            "ejemplo": {
+                "years": [2019, 2020]
+            }
+        }

@@ -3,12 +3,15 @@ from fastapi.responses import JSONResponse
 from utils.constants import Constants
 
 class SystemMiddleware:
+
+
     def __init__(self):
         self.allowed_systems = [
             Constants.SYSTEM_SILUX_SABSA,
             Constants.SYSTEM_SILUX_COBERTURA
         ]
         self.swagger_paths = ["/docs", "/openapi.json", "/redoc"]
+
 
     async def __call__(self, request: Request, call_next):
         try:

@@ -1,4 +1,5 @@
 from typing import List
+from pymysql.connections import Connection
 from utils.constants import Constants
 from utils.queries_handler import (
     update_factura,
@@ -7,7 +8,7 @@ from utils.queries_handler import (
 
 class InvoiceUpdate:
 
-    def __init__(self, connection):
+    def __init__(self, connection: Connection):
         self.connection = connection
 
 

@@ -1,8 +1,9 @@
 import pymysql
 from config.database import DATABASE_CONFIG
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, SparkSession
+from pymysql.connections import Connection
 
-def create_db_connection(system: str):
+def create_db_connection(system: str) -> Connection:
     config = DATABASE_CONFIG.get(system)
     connection = pymysql.connect(
         host=config["host"],
@@ -13,7 +14,7 @@ def create_db_connection(system: str):
     )
     return connection
     
-def read_table_from_db(spark, db_table, system) -> DataFrame:
+def read_table_from_db(spark: SparkSession, db_table: str, system: str) -> DataFrame:
     config = DATABASE_CONFIG.get(system)
     return spark.read.format("jdbc").options(
         url=config['url'],

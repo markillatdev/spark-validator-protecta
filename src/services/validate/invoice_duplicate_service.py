@@ -3,6 +3,8 @@ from pyspark.sql.functions import col # type: ignore
 from services.validate.update_service import InvoiceUpdate
 from config.db_connection import read_table_from_db
 from config.database import PARQUET_INVOICES_PATHS
+from pyspark.sql import SparkSession, DataFrame
+from pymysql.connections import Connection
 from utils.queries_handler import (
     db_table_medden_facturas,
     db_table_validacion_facturas,
@@ -12,7 +14,7 @@ from utils.queries_handler import (
 class InvoiceDuplicateHandler:
 
 
-    def __init__(self, spark, connection, coreSystem):
+    def __init__(self, spark: SparkSession, connection: Connection, coreSystem: str):
         self.spark = spark
         self.connection = connection
         self.invoice_updater = InvoiceUpdate(connection)
@@ -51,7 +53,7 @@ class InvoiceDuplicateHandler:
             self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
 
 
-    def buscar_duplicados(self, df_facturas_filtradas, df_facturas_buscar, system):
+    def buscar_duplicados(self, df_facturas_filtradas: DataFrame, df_facturas_buscar: DataFrame, system: str):
         duplicados_list = df_facturas_filtradas.collect() 
         for row in duplicados_list:
             ruc_proveedor = row['ruc_proveedor']
