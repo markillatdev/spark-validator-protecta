@@ -1,5 +1,6 @@
 from typing import List
 from pydantic import BaseModel
+from utils.constants import Constants
 
 class responseSchema(BaseModel):
     msg: str
@@ -44,10 +45,12 @@ class InvoiceSchema(BaseModel):
 
 class DataFrameSchema(BaseModel):
     years: List[int]
+    origen: str
 
     class Config:
         schema_extra = {
             "ejemplo": {
-                "years": [2019, 2020]
+                "years": [2019, 2020],
+                "origen": [Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA, Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA]
             }
         }

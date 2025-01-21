@@ -28,4 +28,4 @@ async def updateInvoiceUnique(schema: InvoiceSchema, request: Request, token: st
 @router.post("/load-dataframe-to-database", status_code=status.HTTP_200_OK, response_model=responseSchema)
 async def loadDataFrameToDatabase(schema: DataFrameSchema, request: Request, token: str = Depends(verify_token)):
     service = DataFrameLoader(request.headers.get("system"))
-    return service.load_data(schema.years)
+    return service.load_data(schema.years, schema.origen)

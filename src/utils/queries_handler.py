@@ -3,7 +3,7 @@
 from typing import List
 
 
-def db_table_validacion_ordenes(invoiceIds: List[int]):
+def db_table_validacion_ordenes(invoiceIds: List[int]) -> str:
     ids = ', '.join(map(str, invoiceIds)) 
     query = f"""
         (
@@ -20,15 +20,11 @@ def db_table_validacion_ordenes(invoiceIds: List[int]):
             INNER JOIN liqtempo l ON f.id = l.factura_id
             INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
             INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
-            WHERE fv.spark_process = true
-            AND fv.estado_validacion_factura_id = 1 
-            AND fv.tipo_validacion_factura_id = 1
-            AND f.id_estado IN (9, 10)
-            AND fv.factura_id IN ({ids})
+            WHERE fv.factura_id IN ({ids})
         ) AS subquery"""
     return query
 
-def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]):
+def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]) -> str:
     ids = ', '.join(map(str, invoiceIds)) 
     query = f"""
             (
@@ -48,11 +44,7 @@ def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]):
                 INNER JOIN liqtempo l ON f.id = l.factura_id
                 INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
                 INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
-                WHERE fv.spark_process = true
-                AND fv.estado_validacion_factura_id = 1 
-                AND fv.tipo_validacion_factura_id = 1
-                AND f.id_estado IN (9, 10)
-                AND fv.factura_id IN ({ids})
+                WHERE fv.factura_id IN ({ids})
             ) AS subquery"""
     return query
 
@@ -96,27 +88,23 @@ db_table_liquidacion_facturas = """
 ) AS subquery
 """
 
-def db_table_validacion_facturas(invoiceIds: List[int]):
+def db_table_validacion_facturas(invoiceIds: List[int]) -> str:
     ids = ', '.join(map(str, invoiceIds)) 
     query = f"""
             (
                 SELECT 
                 rg.ruc_proveedor,
-                rg.nro_factu 
+                rg.nro_factu
                 FROM factura_validaciones fv
                 INNER JOIN factura f ON f.id = fv.factura_id
                 INNER JOIN liqtempo l ON l.factura_id = f.id
                 INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
-                WHERE fv.spark_process = true
-                AND fv.estado_validacion_factura_id = 1 
-                AND fv.tipo_validacion_factura_id = 1
-                AND f.id_estado IN (9, 10)
-                AND fv.factura_id IN ({ids})
+                WHERE fv.factura_id IN ({ids})
             ) AS subquery
             """
     return query
 
-def db_table_validacion_facturas_with_ids(invoiceIds: List[int]):
+def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
     ids = ', '.join(map(str, invoiceIds)) 
     query = f"""
             (
@@ -130,11 +118,7 @@ def db_table_validacion_facturas_with_ids(invoiceIds: List[int]):
                 INNER JOIN factura f ON f.id = fv.factura_id
                 INNER JOIN liqtempo l ON l.factura_id = f.id
                 INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
-                WHERE fv.spark_process = true
-                AND fv.estado_validacion_factura_id = 1 
-                AND fv.tipo_validacion_factura_id = 1
-                AND f.id_estado IN (9, 10)
-                AND fv.factura_id IN ({ids})
+                WHERE fv.factura_id IN ({ids})
             ) AS subquery
             """
     return query
@@ -143,7 +127,7 @@ db_table_medden_facturas = """
 (
     SELECT 
     rg.ruc_proveedor, 
-    rg.nro_factu 
+    rg.nro_factu
     FROM reporte_general rg
     INNER JOIN liqtempo l ON l.id = rg.id_liqtempo
     INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
@@ -195,42 +179,3 @@ def update_spark_processing(invoiceIds: List[int]) -> str:
         AND fv.factura_id IN ({placeholders})
     """
     return query
-
-#####
-
-db_table_liquidacion_ordenes_silux = """
-(
-    SELECT
-    CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
-    tot_clini AS monto,
-    nro_soli AS nro_solben,
-    ruc AS ruc_proveedor
-    FROM liquidacion 
-    WHERE YEAR(proceso) = 2024
-    AND origen IN (2, 4)
-) AS subquery
-"""
-
-db_table_liquidacion_ordenes_silux_with_ids = """
-(
-    SELECT 
-    DISTINCT
-    fv.id,
-    fv.factura_id,
-    l.codigo_afiliado,
-    f.monto,
-    CASE
-        WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
-        ELSE ls.code_solben
-    END as nro_solben,
-    rg.ruc_proveedor
-    FROM factura_validaciones fv
-    INNER JOIN factura f ON f.id = fv.factura_id
-    INNER JOIN liqtempo l ON f.id = l.factura_id
-    INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
-    INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
-    WHERE fv.spark_process = true
-    AND fv.estado_validacion_factura_id = 1 
-    AND fv.tipo_validacion_factura_id = 1
-    AND f.id_estado IN (13, 15, 16, 17)
-) AS subquery"""

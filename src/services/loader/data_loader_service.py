@@ -2,6 +2,7 @@ from typing import List
 from config.spark_config import create_spark_session
 from utils.parquet_handler import load_or_create_parquet
 from utils.constants import Constants
+import os
 from dotenv import load_dotenv # type: ignore
 load_dotenv()
 
@@ -12,52 +13,97 @@ class DataFrameLoader:
         self.system = system
 
 
-    def load_resources(self, year: int, db_table: str, resource_type: str):
-        systems = [
-            {"system": Constants.SYSTEM_SOLBEN_SABSA, "filename": f"{resource_type}/unix_sabsa/solben_sabsa_{resource_type}_{year}.parquet"},
-            {"system": Constants.SYSTEM_SOLBEN_COBERTURA, "filename": f"{resource_type}/unix_cobertura/solben_cobertura_{resource_type}_{year}.parquet"}
-        ]
+    def load_resources(self, year: int, db_table: str, resource_type: str, origen: str):
+        directory = f"{resource_type}/{origen}"
+        if not os.path.exists(os.getenv("STORAGE_PATH") + "/" + directory):
+            os.makedirs(os.getenv("STORAGE_PATH") + "/" + directory)
+        filename = f"{directory}/solben_{resource_type}_{year}.parquet"
         spark = create_spark_session()
-        for resource in systems:
-            load_or_create_parquet(spark, db_table, resource['filename'], resource['system'])
+        load_or_create_parquet(spark, db_table, filename, origen)
 
 
-    def load_attention(self, year: int, db_table_liquidacion_ordenes: str):
-        self.load_resources(year, db_table_liquidacion_ordenes, "attentions")
+    def load_attention(self, year: int, db_table_liquidacion_ordenes: str, origen: str):
+        self.load_resources(year, db_table_liquidacion_ordenes, "attentions", origen)
 
 
-    def load_invoices(self, year: int, db_table_liquidacion_facturas: str):
-        self.load_resources(year, db_table_liquidacion_facturas, "invoices")
+    def load_invoices(self, year: int, db_table_liquidacion_facturas: str, origen: str):
+        self.load_resources(year, db_table_liquidacion_facturas, "invoices", origen)
 
 
-    def load_data(self, years: List[int]) -> str:
+    def load_data(self, years: List[int], origen: str) -> str:
         years_str = ", ".join(str(year) for year in years)
         years_text = "_".join(str(year) for year in years)
-        db_table_liquidacion_ordenes, db_table_liquidacion_facturas = self.querys(years_str)
-        self.load_attention(years_text, db_table_liquidacion_ordenes)
-        self.load_invoices(years_text, db_table_liquidacion_facturas)
+        db_table_liquidacion_ordenes, db_table_liquidacion_facturas = self.querys(years_str, origen)
+        if not db_table_liquidacion_ordenes or not db_table_liquidacion_facturas:
+            return {"msg": "No se pudo realizar la carga"}
+        self.load_attention(years_text, db_table_liquidacion_ordenes, origen)
+        self.load_invoices(years_text, db_table_liquidacion_facturas, origen)
         return {"msg": "Datos cargados exitosamente"}
 
 
-    def querys(self, years_str: str) -> str:
-        db_table_liquidacion_ordenes = f"""
-        (
-            SELECT
-            CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
-            tot_clini AS monto,
-            nro_soli AS nro_solben,
-            ruc AS ruc_proveedor
-            FROM liquidacion 
-            WHERE YEAR(proceso) IN ({years_str})
-        ) AS subquery
-        """
-        db_table_liquidacion_facturas = f"""
-        (
-            SELECT
-            ruc as ruc_proveedor,
-            nro_factu
-            FROM liquidacion 
-            WHERE YEAR(proceso) IN ({years_str})
-        ) AS subquery
-        """
-        return db_table_liquidacion_ordenes, db_table_liquidacion_facturas
+    def querys(self, years_str: str, origen: str) -> str:
+
+        if origen in {Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA}:
+
+            db_table_liquidacion_ordenes = f"""
+            (
+                SELECT
+                CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
+                tot_clini AS monto,
+                nro_soli AS nro_solben,
+                ruc AS ruc_proveedor
+                FROM liquidacion 
+                WHERE YEAR(proceso) IN ({years_str})
+            ) AS subquery
+            """
+
+            db_table_liquidacion_facturas = f"""
+            (
+                SELECT
+                ruc as ruc_proveedor,
+                nro_factu
+                FROM liquidacion 
+                WHERE YEAR(proceso) IN ({years_str})
+            ) AS subquery
+            """
+
+            return db_table_liquidacion_ordenes, db_table_liquidacion_facturas
+        
+        elif origen in {Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA}:
+
+            db_table_liquidacion_ordenes = f"""
+            (
+                SELECT 
+                l.codigo_afiliado,
+                f.monto,
+                CASE
+                    WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
+                    ELSE ls.code_solben
+                END as nro_solben,
+                rg.ruc_proveedor
+                FROM factura f
+                INNER JOIN liqtempo l ON f.id = l.factura_id
+                INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
+                INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
+                WHERE l.id_estado IN (16, 17)
+                AND YEAR(f.fecha_envio_iafa) IN ({years_str})
+            ) AS subquery
+            """
+
+            db_table_liquidacion_facturas = f"""
+            (
+                SELECT 
+                rg.ruc_proveedor,
+                rg.nro_factu
+                FROM factura f 
+                INNER JOIN liqtempo l ON l.factura_id = f.id
+                INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
+                WHERE l.id_estado IN (16, 17)
+                AND YEAR(f.fecha_envio_iafa) IN ({years_str})
+            ) AS subquery
+            """
+
+            return db_table_liquidacion_ordenes, db_table_liquidacion_facturas
+
+        else:
+            return "", ""

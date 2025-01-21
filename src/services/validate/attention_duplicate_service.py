@@ -50,6 +50,10 @@ class AttentionDuplicateHandler:
                 how="inner"
             )
 
+            df_facturas_filtradas = df_facturas_filtradas.groupBy("codigo_afiliado", "monto", "nro_solben", "ruc_proveedor").count()
+
+            print(df_facturas_filtradas.collect())
+
             self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
         
 
@@ -60,6 +64,7 @@ class AttentionDuplicateHandler:
             monto = row['monto']
             nro_solben = row['nro_solben']
             ruc_proveedor = row['ruc_proveedor']
+            cantidad = row['count']
             
             facturas_encontradas = df_facturas_buscar.filter(
                 (col("codigo_afiliado") == codigo_afiliado) & 
@@ -68,11 +73,12 @@ class AttentionDuplicateHandler:
                 (col("ruc_proveedor") == ruc_proveedor))
 
             facturas_lists = facturas_encontradas.collect()
-
+            
             for value in facturas_lists:
                 factura_id = value["factura_id"]
-                self.invoice_updater.update_invoices_detected(self.message, factura_id, system)
-                print(f"Factura {factura_id} actualizada con la observación: {self.message}")
+                if cantidad > 1:
+                    self.invoice_updater.update_invoices_detected(self.message, factura_id, system)
+                    print(f"Factura {factura_id} actualizada con la observación: {self.message}")
 
 
     def load_dataframes(self, system: str):
