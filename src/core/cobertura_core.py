@@ -27,11 +27,11 @@ class CoberturaCore(BaseMain):
             {"name": Constants.SYSTEM_UNIX_COBERTURA, "load_dataframes": True}
         ]
     
-    def execute_attentions(self):
-        self.validate_attention(self.resources_attentions(), self.systems())
+    def execute_attentions(self, invoiceIds: List[int]):
+        self.validate_attention(self.resources_attentions(), self.systems(), invoiceIds)
 
-    def execute_invoices(self):
-        self.validate_invoices(self.resources_invoices(), self.systems())
+    def execute_invoices(self, invoiceIds: List[int]):
+        self.validate_invoices(self.resources_invoices(), self.systems(), invoiceIds)
 
     def execute_update_invoices(self, invoiceIds: List[int]):
         self.update_invoices_unique(invoiceIds)

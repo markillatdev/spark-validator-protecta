@@ -146,7 +146,8 @@ update_factura = """
         silux_sabsa = %s,
         silux_cobertura = %s,
         unix_sabsa = %s,
-        unix_cobertura = %s
+        unix_cobertura = %s,
+        updated_at = NOW()
     WHERE factura_id = %s
 """
 
@@ -161,7 +162,8 @@ def update_factura_unique(invoiceIds: List[int]) -> str:
             silux_sabsa = 0,
             silux_cobertura = 0,
             unix_sabsa = 0,
-            unix_cobertura = 0
+            unix_cobertura = 0,
+            updated_at = NOW()
         WHERE estado_validacion_factura_id = 1 
         AND tipo_validacion_factura_id = 1
         AND factura_id IN ({placeholders})
@@ -172,7 +174,9 @@ def update_spark_processing(invoiceIds: List[int]) -> str:
     placeholders = ', '.join(['%s'] * len(invoiceIds)) 
     query = f"""
         UPDATE factura_validaciones fv
-        SET fv.spark_process = true 
+        SET 
+            fv.spark_process = true,
+            updated_at = NOW()
         WHERE fv.estado_validacion_factura_id = 1 
         AND fv.tipo_validacion_factura_id = 1
         AND fv.spark_process = false

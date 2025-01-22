@@ -52,8 +52,6 @@ class InvoiceDuplicateHandler:
 
             df_facturas_filtradas = df_facturas_filtradas.groupBy("ruc_proveedor", "nro_factu").count()
 
-            print(df_facturas_filtradas.collect())
-
             self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
 
 

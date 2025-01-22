@@ -11,15 +11,15 @@ ALGORITHM = "HS256"
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=30)
-    to_encode.update({"exp": expire})
+    token_expires_at = datetime.utcnow() + timedelta(minutes=30)
+    to_encode.update({"exp": token_expires_at})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def get_access_token(apiKey: str):
     if apiKey != API_KEY:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unathorized")
     access_token = create_access_token(data={"service": "microservice"})
-    return {"access_token": access_token}
+    return {"access_token": access_token, "expires_in": 1800}
 
 def verify_token(request: Request):
     authorization = request.headers.get("Authorization")

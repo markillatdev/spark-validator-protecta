@@ -1,24 +1,29 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 from utils.constants import Constants
+from pydantic import validator
 
 class responseSchema(BaseModel):
     msg: str
+    total: Optional[int] = None
     
     class Config:
         shema_extra = {
             "ejemplo": {
                 "msg": "success",
+                "total": 12
             }
         }
 
 class JwtSchema(BaseModel):
     access_token: str
+    expires_in: int
 
     class Config:
         schema_extra = {
             "ejemplo": {
-                "access_token": "************"
+                "access_token": "************",
+                "expires_in": 1800
             }
         }
 
@@ -32,8 +37,15 @@ class ApiKeySchema(BaseModel):
             }
         }
 
+
 class InvoiceSchema(BaseModel):
     invoiceIds: List[int]
+
+    @validator('invoiceIds')
+    def check_not_empty(cls, v):
+        if not v:
+            raise ValueError('invoiceIds list cannot be empty')
+        return v
 
     class Config:
         schema_extra = {
@@ -41,6 +53,7 @@ class InvoiceSchema(BaseModel):
                 "invoiceIds": [1, 2, 3, 4, 5, 6]
             }
         }
+
 
 
 class DataFrameSchema(BaseModel):

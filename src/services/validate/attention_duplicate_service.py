@@ -40,6 +40,8 @@ class AttentionDuplicateHandler:
                 read_table_from_db(self.spark, db_table_medden_ordenes, system['name'])
             )                
             
+            print(self.load_dataframes("unix_sabsa").count())
+
             if df_liquidaciones is None:
                 print(f"No se pudieron cargar datos para el sistema: {system['name']}")
                 continue 
@@ -51,8 +53,6 @@ class AttentionDuplicateHandler:
             )
 
             df_facturas_filtradas = df_facturas_filtradas.groupBy("codigo_afiliado", "monto", "nro_solben", "ruc_proveedor").count()
-
-            print(df_facturas_filtradas.collect())
 
             self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
         
