@@ -3,17 +3,21 @@ from pydantic import BaseModel
 from utils.constants import Constants
 from pydantic import validator
 
+
 class responseSchema(BaseModel):
     msg: str
+    success: bool
     total: Optional[int] = None
     
     class Config:
         shema_extra = {
             "ejemplo": {
                 "msg": "success",
+                "success": True,
                 "total": 12
             }
         }
+
 
 class JwtSchema(BaseModel):
     access_token: str
@@ -26,6 +30,7 @@ class JwtSchema(BaseModel):
                 "expires_in": 1800
             }
         }
+
 
 class ApiKeySchema(BaseModel):
     apikey: str
@@ -53,7 +58,6 @@ class InvoiceSchema(BaseModel):
                 "invoiceIds": [1, 2, 3, 4, 5, 6]
             }
         }
-
 
 
 class DataFrameSchema(BaseModel):

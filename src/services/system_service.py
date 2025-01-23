@@ -27,7 +27,7 @@ class SystemService:
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Sistema '{self.system}' no encontrado"
                 )
-            return {"msg": "La operación ha sido ejecutada", "total": len(invoiceIds)}
+            return {"msg": "La operación ha sido ejecutada", "success": True, "total": len(invoiceIds)}
         except HTTPException as ex:
             logger.error(f"HTTPException en operations_attention: {ex.detail}")
             raise HTTPException(
@@ -54,7 +54,7 @@ class SystemService:
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Sistema '{self.system}' no encontrado"
                 )
-            return {"msg": "La operación ha sido ejecutada", "total": len(invoiceIds)}
+            return {"msg": "La operación ha sido ejecutada", "success": True, "total": len(invoiceIds)}
         except HTTPException as ex:
             logger.error(f"HTTPException en operations_invoices: {ex.detail}")
             raise HTTPException(
@@ -81,7 +81,7 @@ class SystemService:
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Sistema '{self.system}' no encontrado"
                 )
-            return {"msg": "La operación de actualizar facturas unicas ha sido ejecutada", "total": len(invoiceIds)}
+            return {"msg": "La operación de actualizar facturas unicas ha sido ejecutada", "success": True, "total": len(invoiceIds)}
         except HTTPException as ex:
             logger.error(f"HTTPException en operations_invoices: {ex.detail}")
             raise HTTPException(
