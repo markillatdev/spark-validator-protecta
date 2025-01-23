@@ -35,10 +35,10 @@ class DataFrameLoader:
         years_text = "_".join(str(year) for year in years)
         db_table_liquidacion_ordenes, db_table_liquidacion_facturas = self.querys(years_str, origen)
         if not db_table_liquidacion_ordenes or not db_table_liquidacion_facturas:
-            return {"msg": "No se pudo realizar la carga"}
+            return {"msg": "No se pudo realizar la carga", "success": False}
         self.load_attention(years_text, db_table_liquidacion_ordenes, origen)
         self.load_invoices(years_text, db_table_liquidacion_facturas, origen)
-        return {"msg": "Datos cargados exitosamente"}
+        return {"msg": "Datos cargados exitosamente", "success": True}
 
 
     def querys(self, years_str: str, origen: str) -> str:

@@ -36,6 +36,12 @@ ENV SPARK_HOME=/opt/spark
 ENV PATH=$SPARK_HOME/bin:$PATH
 ENV SPARK_LOCAL_DIRS=/opt/spark/work
 ENV SPARK_CONF_DIR=/opt/spark/conf
+ENV SPARK_MODE=master
+ENV SPARK_USER=spark
+ENV SPARK_SSL_ENABLED=no
+ENV SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+ENV SPARK_RPC_ENCRYPTION_ENABLED=no
+ENV SPARK_RPC_AUTHENTICATION_ENABLED=no
 
 # Configurar variables de entorno para Python
 ENV PYSPARK_PYTHON=python3
@@ -57,7 +63,7 @@ COPY . /src
 ENV STORAGE_PATH=/src/repositories
 
 # Exponer los puertos necesarios
-EXPOSE 8080 7077 4040 8000
+EXPOSE 8080 8000
 
 #Configuracion de supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
