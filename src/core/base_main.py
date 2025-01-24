@@ -43,3 +43,8 @@ class BaseMain:
         connection = create_db_connection(self.system)
         invoice = InvoiceUpdate(connection)
         invoice.update_invoices_unique("Factura unica", invoiceIds)
+
+    def update_reset_invoices(self, invoiceIds: List[int]):
+        connection = create_db_connection(self.system)
+        invoice = InvoiceUpdate(connection)
+        invoice.update_reset_invoices("", invoiceIds)

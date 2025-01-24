@@ -4,6 +4,7 @@ from utils.constants import Constants
 from utils.queries_handler import (
     update_factura,
     update_factura_unique,
+    update_reset_invoices,
     update_spark_processing)
 
 class InvoiceUpdate:
@@ -31,6 +32,17 @@ class InvoiceUpdate:
     def update_invoices_unique(self, message: str, invoiceIds: List[int]):
         try:
             query = update_factura_unique(invoiceIds)
+            params = [message] + invoiceIds
+            cursor = self.connection.cursor()
+            cursor.execute(query, params)
+            self.connection.commit()
+        except Exception as e:
+            print(f"Error actualizando: {e}")
+
+    
+    def update_reset_invoices(self, message: str, invoiceIds: List[int]):
+        try:
+            query = update_reset_invoices(invoiceIds)
             params = [message] + invoiceIds
             cursor = self.connection.cursor()
             cursor.execute(query, params)

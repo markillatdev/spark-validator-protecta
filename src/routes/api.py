@@ -26,6 +26,11 @@ async def updateInvoiceUnique(schema: InvoiceSchema, request: Request, token: st
     service = SystemService(request.headers.get("system"))
     return service.operations_update_invoices(schema.invoiceIds)
 
+@router.put("/update-reset-invoices", status_code=status.HTTP_200_OK, response_model=responseSchema)
+async def updateResetInvoice(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):
+    service = SystemService(request.headers.get("system"))
+    return service.operations_update_reset_invoices(schema.invoiceIds)
+
 @router.post("/load-dataframe-to-database", status_code=status.HTTP_200_OK, response_model=responseBasicSchema)
 async def loadDataFrameToDatabase(schema: DataFrameSchema, request: Request, token: str = Depends(verify_token)):
     service = DataFrameLoader(request.headers.get("system"))

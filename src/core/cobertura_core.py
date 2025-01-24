@@ -35,3 +35,6 @@ class CoberturaCore(BaseMain):
 
     def execute_update_invoices(self, invoiceIds: List[int]):
         self.update_invoices_unique(invoiceIds)
+
+    def execute_reset_invoices(self, invoiceIds: List[int]):
+        self.update_reset_invoices(invoiceIds)

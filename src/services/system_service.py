@@ -94,3 +94,30 @@ class SystemService:
                 status_code=status.HTTP_400_BAD_REQUEST, 
                 detail="Hubo un error"
             )
+        
+    def operations_update_reset_invoices(self, invoiceIds: List[int]):
+        try:
+            if self.system == Constants.SYSTEM_SILUX_SABSA:
+                sabsa = SabsaCore(self.system)
+                sabsa.execute_reset_invoices(invoiceIds)
+            elif self.system == Constants.SYSTEM_SILUX_COBERTURA:
+                cobertura = CoberturaCore(self.system)
+                cobertura.execute_reset_invoices(invoiceIds)
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Sistema '{self.system}' no encontrado"
+                )
+            return {"msg": "La operación de resetear facturas ha sido ejecutada", "success": True, "total": len(invoiceIds)}
+        except HTTPException as ex:
+            logger.error(f"HTTPException en operations_invoices: {ex.detail}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=ex.detail
+            )    
+        except Exception as ex:
+            logger.error(f"Error inesperado en operations update reset invoices: {str(ex)}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail="Hubo un error"
+            )

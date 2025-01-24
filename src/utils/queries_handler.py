@@ -170,6 +170,24 @@ def update_factura_unique(invoiceIds: List[int]) -> str:
     """
     return query
 
+def update_reset_invoices(invoiceIds: List[int]) -> str:
+    placeholders = ', '.join(['%s'] * len(invoiceIds)) 
+    query = f"""
+        UPDATE factura_validaciones
+        SET 
+            observacion = %s,
+            estado_validacion_factura_id = 1,
+            tipo_validacion_factura_id = 1,
+            silux_sabsa = 0,
+            silux_cobertura = 0,
+            unix_sabsa = 0,
+            unix_cobertura = 0,
+            spark_process = 0,
+            updated_at = NOW()
+        WHERE factura_id IN ({placeholders})
+    """
+    return query
+
 def update_spark_processing(invoiceIds: List[int]) -> str:
     placeholders = ', '.join(['%s'] * len(invoiceIds)) 
     query = f"""
