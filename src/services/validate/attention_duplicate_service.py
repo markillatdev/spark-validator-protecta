@@ -38,9 +38,7 @@ class AttentionDuplicateHandler:
             df_liquidaciones = (
                 self.load_dataframes(system['name']) if system.get("load_dataframes") else 
                 read_table_from_db(self.spark, db_table_medden_ordenes, system['name'])
-            )                
-            
-            print(self.load_dataframes("unix_sabsa").count())
+            )                            
 
             if df_liquidaciones is None:
                 print(f"No se pudieron cargar datos para el sistema: {system['name']}")

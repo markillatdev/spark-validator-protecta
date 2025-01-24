@@ -1,5 +1,6 @@
 from typing import List
 from config.spark_config import create_spark_session
+from schemas.schema import responseBasicSchema
 from utils.parquet_handler import load_or_create_parquet
 from utils.constants import Constants
 import os
@@ -30,7 +31,7 @@ class DataFrameLoader:
         self.load_resources(year, db_table_liquidacion_facturas, "invoices", origen)
 
 
-    def load_data(self, years: List[int], origen: str) -> str:
+    def load_data(self, years: List[int], origen: str) -> responseBasicSchema:
         years_str = ", ".join(str(year) for year in years)
         years_text = "_".join(str(year) for year in years)
         db_table_liquidacion_ordenes, db_table_liquidacion_facturas = self.querys(years_str, origen)

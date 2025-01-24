@@ -15,7 +15,7 @@ def test_count_records_in_parquet_files(spark):
     
     # Validar que STORAGE_PATH está configurado
     assert storage_path, "La variable de entorno STORAGE_PATH no está configurada."
-    storage_path = os.path.join(storage_path, "repositories", "attentions", "unix_sabsa")
+    storage_path = os.path.join(storage_path, "attentions", "unix_sabsa")
 
     # Verificar que el directorio existe
     assert os.path.exists(storage_path), f"El directorio {storage_path} no existe."

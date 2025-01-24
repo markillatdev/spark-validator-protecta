@@ -18,6 +18,17 @@ class responseSchema(BaseModel):
             }
         }
 
+class responseBasicSchema(BaseModel):
+    msg: str
+    success: bool
+    
+    class Config:
+        shema_extra = {
+            "ejemplo": {
+                "msg": "success",
+                "success": True
+            }
+        }
 
 class JwtSchema(BaseModel):
     access_token: str
@@ -69,5 +80,16 @@ class DataFrameSchema(BaseModel):
             "ejemplo": {
                 "years": [2019, 2020],
                 "origen": [Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA, Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA]
+            }
+        }
+
+
+class GetRecordsSchema(BaseModel):
+    repository: str
+
+    class Config:
+        schema_extra = {
+            "ejemplo": {
+                "repository": ["unix_sabsa", "unix_cobertura"],
             }
         }
