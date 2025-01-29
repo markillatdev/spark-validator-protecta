@@ -3,34 +3,11 @@
 from typing import List
 
 
-def db_table_validacion_ordenes(invoiceIds: List[int]) -> str:
-    ids = ', '.join(map(str, invoiceIds)) 
-    query = f"""
-        (
-            SELECT 
-            l.codigo_afiliado,
-            f.monto,
-            CASE
-                WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
-                ELSE ls.code_solben
-            END as nro_solben,
-            rg.ruc_proveedor
-            FROM factura_validaciones fv
-            INNER JOIN factura f ON f.id = fv.factura_id
-            INNER JOIN liqtempo l ON f.id = l.factura_id
-            INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
-            INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
-            WHERE fv.factura_id IN ({ids})
-        ) AS subquery"""
-    return query
-
 def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]) -> str:
     ids = ', '.join(map(str, invoiceIds)) 
     query = f"""
             (
                 SELECT 
-                DISTINCT
-                fv.id,
                 fv.factura_id,
                 l.codigo_afiliado,
                 f.monto,
@@ -88,29 +65,11 @@ db_table_liquidacion_facturas = """
 ) AS subquery
 """
 
-def db_table_validacion_facturas(invoiceIds: List[int]) -> str:
-    ids = ', '.join(map(str, invoiceIds)) 
-    query = f"""
-            (
-                SELECT 
-                rg.ruc_proveedor,
-                rg.nro_factu
-                FROM factura_validaciones fv
-                INNER JOIN factura f ON f.id = fv.factura_id
-                INNER JOIN liqtempo l ON l.factura_id = f.id
-                INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
-                WHERE fv.factura_id IN ({ids})
-            ) AS subquery
-            """
-    return query
-
 def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
     ids = ', '.join(map(str, invoiceIds)) 
     query = f"""
             (
                 SELECT 
-                DISTINCT
-                fv.id, 
                 fv.factura_id,
                 rg.ruc_proveedor, 
                 rg.nro_factu

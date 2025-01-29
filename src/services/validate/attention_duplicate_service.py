@@ -5,9 +5,9 @@ from config.db_connection import read_table_from_db
 from services.validate.update_service import InvoiceUpdate
 from pyspark.sql import SparkSession, DataFrame
 from pymysql.connections import Connection
+from pyspark.sql.types import StructType, StructField, StringType
 from utils.queries_handler import (
     db_table_medden_ordenes,
-    db_table_validacion_ordenes,
     db_table_validacion_ordenes_with_ids
 )
 
@@ -23,8 +23,8 @@ class AttentionDuplicateHandler:
     
 
     def procesar_atenciones(self, systems_validate: List[str], invoiceIds: List[int]):
-        df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_ordenes(invoiceIds), self.coreSystem)
         df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_ordenes_with_ids(invoiceIds), self.coreSystem)
+        df_facturas_por_validar = self.createDataFrameInvoice(df_facturas_buscar)
         self.invoice_updater.update_spark_processing(invoiceIds)
 
         for system in systems_validate:
@@ -82,3 +82,15 @@ class AttentionDuplicateHandler:
     def load_dataframes(self, system: str):
         path = PARQUET_ATTENTIONS_PATHS.get(system)
         return self.spark.read.parquet(path) if path else None
+
+
+    def createDataFrameInvoice(self, df_facturas_buscar: DataFrame) -> DataFrame:
+        query_results = df_facturas_buscar.collect()
+        data = [(row['codigo_afiliado'], row['monto'], row['nro_solben'], row['ruc_proveedor']) for row in query_results]
+        schema = StructType([
+            StructField("codigo_afiliado", StringType(), True),
+            StructField("monto", StringType(), True),
+            StructField("nro_solben", StringType(), True),
+            StructField("ruc_proveedor", StringType(), True)
+        ])
+        return self.spark.createDataFrame(data, schema)

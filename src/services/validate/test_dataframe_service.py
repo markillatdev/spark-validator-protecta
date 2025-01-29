@@ -5,11 +5,6 @@ from pyspark.sql import DataFrame, SparkSession
 from config.database import PARQUET_INVOICES_PATHS
 from utils.constants import Constants
 from pyspark.sql.types import StructType, StructField, StringType
-from config.db_connection import read_table_from_db
-from utils.queries_handler import (
-    db_table_validacion_facturas,
-    db_table_validacion_facturas_with_ids
-)
 
 class testDataframeService:
     def __init__(self, invoiceIds: List[int], coreSystem: str):
@@ -18,8 +13,6 @@ class testDataframeService:
 
     def res(self):
         spark = create_spark_session()
-        #df_facturas_por_validar = read_table_from_db(spark, db_table_validacion_facturas(self.invoiceIds), self.coreSystem)
-        #df_facturas_buscar = read_table_from_db(spark, db_table_validacion_facturas_with_ids(self.invoiceIds), self.coreSystem)
 
         df_facturas_por_validar = self.simulation_facturas_por_validar(spark)
         df_facturas_buscar = self.simulation_facturas_por_validar_with_ids(spark)

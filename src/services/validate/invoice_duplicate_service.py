@@ -5,9 +5,9 @@ from config.db_connection import read_table_from_db
 from config.database import PARQUET_INVOICES_PATHS
 from pyspark.sql import SparkSession, DataFrame
 from pymysql.connections import Connection
+from pyspark.sql.types import StructType, StructField, StringType
 from utils.queries_handler import (
     db_table_medden_facturas,
-    db_table_validacion_facturas,
     db_table_validacion_facturas_with_ids
 )
 
@@ -23,8 +23,8 @@ class InvoiceDuplicateHandler:
     
 
     def procesar_facturas(self, systems_validate: List[str], invoiceIds: List[int]):
-        df_facturas_por_validar = read_table_from_db(self.spark, db_table_validacion_facturas(invoiceIds), self.coreSystem)
         df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_facturas_with_ids(invoiceIds), self.coreSystem)
+        df_facturas_por_validar = self.createDataFrameInvoice(df_facturas_buscar)
         self.invoice_updater.update_spark_processing(invoiceIds)
 
         for system in systems_validate:
@@ -78,3 +78,13 @@ class InvoiceDuplicateHandler:
     def load_dataframes(self, system: str):
         path = PARQUET_INVOICES_PATHS.get(system)
         return self.spark.read.parquet(path) if path else None
+
+
+    def createDataFrameInvoice(self, df_facturas_buscar: DataFrame) -> DataFrame:
+        query_results = df_facturas_buscar.collect()
+        data = [(row['ruc_proveedor'], row['nro_factu']) for row in query_results]
+        schema = StructType([
+            StructField("ruc_proveedor", StringType(), True),
+            StructField("nro_factu", StringType(), True)
+        ])
+        return self.spark.createDataFrame(data, schema)
