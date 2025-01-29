@@ -4,6 +4,7 @@ from services.loader.count_dataframe_service import CountDataframe
 from services.system_service import SystemService
 from services.loader.data_loader_service import DataFrameLoader
 from services.jwt_service import *
+from services.validate.test_dataframe_service import testDataframeService
 
 router = APIRouter()
 
@@ -40,3 +41,8 @@ async def loadDataFrameToDatabase(schema: DataFrameSchema, request: Request, tok
 async def getCountRecordsDataframes(schema: GetRecordsSchema, token: str = Depends(verify_token)):
     service = CountDataframe()
     return service.count_merged_records(schema.repository)
+
+@router.post("/test-dataframes", status_code=status.HTTP_200_OK, response_model=responseBasicSchema)
+async def testDataFrames(schema: InvoiceSchema, request: Request):
+    service = testDataframeService(schema.invoiceIds, request.headers.get("system"))
+    return service.res()
