@@ -4,6 +4,7 @@ from schemas.schema import responseBasicSchema
 from utils.parquet_handler import load_or_create_parquet
 from utils.constants import Constants
 import os
+import shutil
 from dotenv import load_dotenv # type: ignore
 load_dotenv()
 
@@ -34,6 +35,8 @@ class DataFrameLoader:
     def load_data(self, years: List[int], origen: str) -> responseBasicSchema:
         years_str = ", ".join(str(year) for year in years)
         years_text = "_".join(str(year) for year in years)
+        if not origen in {Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA, Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA}:
+            return {"msg": f"No existe el sistema {origen}", "success": False}
         db_table_liquidacion_ordenes, db_table_liquidacion_facturas = self.querys(years_str, origen)
         if not db_table_liquidacion_ordenes or not db_table_liquidacion_facturas:
             return {"msg": "No se pudo realizar la carga", "success": False}
@@ -108,3 +111,17 @@ class DataFrameLoader:
 
         else:
             return "", ""
+
+
+    def destroy_dataframe(self, origen: str):
+        if origen not in {Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA, Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA}:
+            return {"msg": f"No existe el sistema {origen}", "success": False}
+        resources = {"attentions", "invoices"}
+        for resource in resources:
+            directory = f"{resource}/{origen}"
+            path = os.path.join(os.getenv("STORAGE_PATH"), directory)
+            print(path)
+            if not os.path.exists(path):
+                return {"msg": f"No existe el directorio {path}", "success": False}
+            shutil.rmtree(path)
+        return {"msg": "Directorios eliminados exitosamente", "success": True}

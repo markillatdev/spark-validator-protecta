@@ -83,6 +83,15 @@ class DataFrameSchema(BaseModel):
             }
         }
 
+class DestroyDataFrameSchema(BaseModel):
+    origen: str
+
+    class Config:
+        schema_extra = {
+            "ejemplo": {
+                "origen": [Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA, Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA]
+            }
+        }
 
 class GetRecordsSchema(BaseModel):
     repository: str

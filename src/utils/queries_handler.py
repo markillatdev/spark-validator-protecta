@@ -2,7 +2,6 @@
 
 from typing import List
 
-
 def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]) -> str:
     ids = ', '.join(map(str, invoiceIds)) 
     query = f"""
@@ -25,6 +24,7 @@ def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]) -> str:
             ) AS subquery"""
     return query
 
+
 db_table_medden_ordenes = """
 (
     SELECT 
@@ -39,31 +39,10 @@ db_table_medden_ordenes = """
     INNER JOIN liqtempo l ON l.id = rg.id_liqtempo
     INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
     WHERE l.id_estado IN (13, 15, 16, 17, 18)
+    AND YEAR(l.created_at) = (SELECT YEAR(NOW()))
 ) AS subquery"""
 
-db_table_liquidacion_ordenes = """
-(
-    SELECT
-    CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
-    tot_clini AS monto,
-    nro_soli AS nro_solben,
-    ruc AS ruc_proveedor
-    FROM liquidacion 
-    WHERE YEAR(proceso) = 2024
-) AS subquery
-"""
-
 #### Invoice Duplicate ####
-
-db_table_liquidacion_facturas = """
-(
-    SELECT
-    ruc as ruc_proveedor,
-    nro_factu
-    FROM liquidacion 
-    WHERE YEAR(proceso) = 2024
-) AS subquery
-"""
 
 def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
     ids = ', '.join(map(str, invoiceIds)) 
@@ -82,6 +61,7 @@ def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
             """
     return query
 
+
 db_table_medden_facturas = """
 (
     SELECT 
@@ -91,6 +71,7 @@ db_table_medden_facturas = """
     INNER JOIN liqtempo l ON l.id = rg.id_liqtempo
     INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
     WHERE l.id_estado IN (13, 15, 16, 17, 18)
+    AND YEAR(l.created_at) = (SELECT YEAR(NOW()))
 ) AS subquery
 """
 
@@ -109,6 +90,7 @@ update_factura = """
         updated_at = NOW()
     WHERE factura_id = %s
 """
+
 
 def update_factura_unique(invoiceIds: List[int]) -> str:
     placeholders = ', '.join(['%s'] * len(invoiceIds)) 
@@ -129,6 +111,7 @@ def update_factura_unique(invoiceIds: List[int]) -> str:
     """
     return query
 
+
 def update_reset_invoices(invoiceIds: List[int]) -> str:
     placeholders = ', '.join(['%s'] * len(invoiceIds)) 
     query = f"""
@@ -146,6 +129,7 @@ def update_reset_invoices(invoiceIds: List[int]) -> str:
         WHERE factura_id IN ({placeholders})
     """
     return query
+
 
 def update_spark_processing(invoiceIds: List[int]) -> str:
     placeholders = ', '.join(['%s'] * len(invoiceIds)) 

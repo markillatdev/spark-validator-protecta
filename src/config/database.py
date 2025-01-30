@@ -33,11 +33,15 @@ DATABASE_CONFIG = {
 }
 
 PARQUET_ATTENTIONS_PATHS = {
-    Constants.SYSTEM_UNIX_SABSA: f'{os.getenv("STORAGE_PATH")}/attentions/unix_sabsa/*.parquet',
-    Constants.SYSTEM_UNIX_COBERTURA: f'{os.getenv("STORAGE_PATH")}/attentions/unix_cobertura/*.parquet',
+    Constants.SYSTEM_UNIX_SABSA: f'{os.getenv("STORAGE_PATH")}/attentions/{Constants.SYSTEM_UNIX_SABSA}/*.parquet',
+    Constants.SYSTEM_UNIX_COBERTURA: f'{os.getenv("STORAGE_PATH")}/attentions/{Constants.SYSTEM_UNIX_COBERTURA}/*.parquet',
+    Constants.SYSTEM_SILUX_SABSA: f'{os.getenv("STORAGE_PATH")}/attentions/{Constants.SYSTEM_SILUX_SABSA}/*.parquet',
+    Constants.SYSTEM_SILUX_COBERTURA: f'{os.getenv("STORAGE_PATH")}/attentions/{Constants.SYSTEM_SILUX_COBERTURA}/*.parquet'
 }
 
 PARQUET_INVOICES_PATHS = {
-    Constants.SYSTEM_UNIX_SABSA: f'{os.getenv("STORAGE_PATH")}/invoices/unix_sabsa/*.parquet',
-    Constants.SYSTEM_UNIX_COBERTURA: f'{os.getenv("STORAGE_PATH")}/invoices/unix_cobertura/*.parquet',
+    Constants.SYSTEM_UNIX_SABSA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_UNIX_SABSA}/*.parquet',
+    Constants.SYSTEM_UNIX_COBERTURA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_UNIX_COBERTURA}/*.parquet',
+    Constants.SYSTEM_SILUX_SABSA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_SILUX_SABSA}/*.parquet',
+    Constants.SYSTEM_SILUX_COBERTURA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_SILUX_COBERTURA}/*.parquet'
 }
