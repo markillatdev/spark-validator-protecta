@@ -120,7 +120,6 @@ class DataFrameLoader:
         for resource in resources:
             directory = f"{resource}/{origen}"
             path = os.path.join(os.getenv("STORAGE_PATH"), directory)
-            print(path)
             if not os.path.exists(path):
                 return {"msg": f"No existe el directorio {path}", "success": False}
             shutil.rmtree(path)
