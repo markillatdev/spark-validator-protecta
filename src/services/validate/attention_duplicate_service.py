@@ -1,3 +1,4 @@
+import os
 from typing import List
 from pyspark.sql.functions import col # type: ignore
 from config.database import PARQUET_ATTENTIONS_PATHS
@@ -32,8 +33,6 @@ class AttentionDuplicateHandler:
             if df_facturas_por_validar.count() == 0:
                 print("No hay facturas pendientes por procesar.")
                 break
-
-            print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
             
             df_liquidaciones = (
                 self.load_dataframes(system['name']) if system.get("load_dataframes") else 
@@ -43,6 +42,8 @@ class AttentionDuplicateHandler:
             if df_liquidaciones is None:
                 print(f"No se pudieron cargar datos para el sistema: {system['name']}")
                 continue 
+            
+            print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
 
             df_facturas_filtradas = df_liquidaciones.join(
                 df_facturas_por_validar.select("codigo_afiliado", "monto", "nro_solben", "ruc_proveedor").distinct(),
@@ -81,6 +82,9 @@ class AttentionDuplicateHandler:
 
     def load_dataframes(self, system: str):
         path = PARQUET_ATTENTIONS_PATHS.get(system)
+        directory = os.path.dirname(path)
+        if not os.path.exists(directory):
+            return None
         return self.spark.read.parquet(path) if path else None
 
 

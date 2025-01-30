@@ -1,3 +1,4 @@
+import os
 from typing import List
 from pyspark.sql.functions import col # type: ignore
 from services.validate.update_service import InvoiceUpdate
@@ -32,8 +33,6 @@ class InvoiceDuplicateHandler:
             if df_facturas_por_validar.count() == 0:
                 print("No hay facturas pendientes por procesar.")
                 break
-
-            print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
             
             df_liquidaciones = (
                 self.load_dataframes(system['name']) if system.get("load_dataframes") else 
@@ -43,6 +42,8 @@ class InvoiceDuplicateHandler:
             if df_liquidaciones is None:
                 print(f"No se pudieron cargar datos para el sistema: {system['name']}")
                 continue 
+
+            print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
 
             df_facturas_filtradas = df_liquidaciones.join(
                 df_facturas_por_validar.select("ruc_proveedor", "nro_factu").distinct(),
@@ -77,6 +78,9 @@ class InvoiceDuplicateHandler:
 
     def load_dataframes(self, system: str):
         path = PARQUET_INVOICES_PATHS.get(system)
+        directory = os.path.dirname(path)
+        if not os.path.exists(directory):
+            return None
         return self.spark.read.parquet(path) if path else None
 
 
