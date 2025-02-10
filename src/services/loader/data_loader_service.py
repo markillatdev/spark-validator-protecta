@@ -89,7 +89,7 @@ class DataFrameLoader:
                 INNER JOIN liqtempo l ON f.id = l.factura_id
                 INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
                 INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
-                WHERE l.id_estado IN (16, 17)
+                WHERE f.id_estado IN (16, 17)
                 AND YEAR(f.fecha_envio_iafa) IN ({years_str})
             ) AS subquery
             """
@@ -102,7 +102,7 @@ class DataFrameLoader:
                 FROM factura f 
                 INNER JOIN liqtempo l ON l.factura_id = f.id
                 INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
-                WHERE l.id_estado IN (16, 17)
+                WHERE f.id_estado IN (16, 17)
                 AND YEAR(f.fecha_envio_iafa) IN ({years_str})
             ) AS subquery
             """

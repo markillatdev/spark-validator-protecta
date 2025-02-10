@@ -71,7 +71,7 @@ class InvoiceDuplicateHandler:
 
             for value in facturas_lists:
                 factura_id = value["factura_id"]
-                if cantidad > 1:
+                if cantidad >= 1:
                     self.invoice_updater.update_invoices_detected(self.message, factura_id, system)
                     print(f"Factura {factura_id} actualizada con la observación: {self.message}")
 
