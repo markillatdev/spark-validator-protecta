@@ -29,6 +29,16 @@ DATABASE_CONFIG = {
         "url": os.getenv("DB_URL_SOLBEN_CM"),
         "user": os.getenv("DB_USER_SOLBEN_CM"),
         "password": os.getenv("DB_PASSWORD_SOLBEN_CM")
+    },
+     Constants.SYSTEM_UNIX_SABSA: {
+        "url": os.getenv("DB_URL_SOLBEN_SABSA"),
+        "user": os.getenv("DB_USER_SOLBEN_SABSA"),
+        "password": os.getenv("DB_PASSWORD_SOLBEN_SABSA")
+    },
+    Constants.SYSTEM_UNIX_COBERTURA: {
+        "url": os.getenv("DB_URL_SOLBEN_CM"),
+        "user": os.getenv("DB_USER_SOLBEN_CM"),
+        "password": os.getenv("DB_PASSWORD_SOLBEN_CM")
     }
 }
 
