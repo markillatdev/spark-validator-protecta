@@ -8,6 +8,7 @@ def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]) -> str:
             (
                 SELECT 
                 fv.factura_id,
+                f.id_estado,
                 l.codigo_afiliado,
                 f.monto,
                 CASE
@@ -50,6 +51,7 @@ def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
             (
                 SELECT 
                 fv.factura_id,
+                f.id_estado,
                 rg.ruc_proveedor, 
                 rg.nro_factu
                 FROM factura_validaciones fv
