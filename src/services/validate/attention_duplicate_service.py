@@ -77,14 +77,10 @@ class AttentionDuplicateHandler:
                 factura_id = value["factura_id"]
                 estado_id = value['id_estado']
 
-                if estado_id in {9, 10}:
-                    if cantidad > 0:
-                        self.invoice_updater.update_invoices_detected(self.message, factura_id, system)
-                        print(f"Factura {factura_id} actualizada con la observación: {self.message} con estado {estado_id} condicion > 0")
-                elif estado_id in {13, 15, 16, 17, 18}:
+                if estado_id in {9, 10, 13, 15, 16, 17, 18}:
                     if cantidad > 1:
                         self.invoice_updater.update_invoices_detected(self.message, factura_id, system)
-                        print(f"Factura {factura_id} actualizada con la observación: {self.message} con estado {estado_id} condicion > 1")
+                        print(f"Factura {factura_id} actualizada con la observación: {self.message} con estado {estado_id}")
                 else:
                     print(f"El estado {estado_id} no esta contemplado")        
 

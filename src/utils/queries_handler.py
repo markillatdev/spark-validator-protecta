@@ -39,7 +39,7 @@ db_table_medden_ordenes = """
     FROM reporte_general rg
     INNER JOIN liqtempo l ON l.id = rg.id_liqtempo
     INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
-    WHERE l.id_estado IN (13, 15, 16, 17, 18)
+    WHERE l.id_estado IN (9, 10, 13, 15, 16, 17, 18)
     AND YEAR(l.created_at) = (SELECT YEAR(NOW()))
 ) AS subquery"""
 
@@ -72,7 +72,7 @@ db_table_medden_facturas = """
     FROM reporte_general rg
     INNER JOIN liqtempo l ON l.id = rg.id_liqtempo
     INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
-    WHERE l.id_estado IN (13, 15, 16, 17, 18)
+    WHERE l.id_estado IN (9, 10, 13, 15, 16, 17, 18)
     AND YEAR(l.created_at) = (SELECT YEAR(NOW()))
 ) AS subquery
 """
