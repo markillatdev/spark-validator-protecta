@@ -6,6 +6,7 @@ from config.db_connection import read_table_from_db
 from config.database import PARQUET_INVOICES_PATHS
 from pyspark.sql import SparkSession, DataFrame
 from pymysql.connections import Connection
+from utils.constants import Constants
 from pyspark.sql.types import StructType, StructField, StringType
 from utils.queries_handler import (
     db_table_medden_facturas,
@@ -73,7 +74,7 @@ class InvoiceDuplicateHandler:
                 factura_id = value["factura_id"]
                 estado_id = value["id_estado"]
 
-                if estado_id in {9, 10, 13, 15, 16, 17, 18}:
+                if estado_id in Constants.ESTADOS_VALIDOS:
                     if cantidad > 1:
                         self.invoice_updater.update_invoices_detected(self.message, factura_id, system)
                         print(f"Factura {factura_id} actualizada con la observación: {self.message} con estado {estado_id}")
