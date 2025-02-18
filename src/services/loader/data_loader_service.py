@@ -84,11 +84,11 @@ class DataFrameLoader:
                     WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
                     ELSE ls.code_solben
                 END as nro_solben,
-                rg.ruc_proveedor
+                fp.ruc_proveedor
                 FROM factura f
-                INNER JOIN liqtempo l ON f.id = l.factura_id
+                INNER JOIN liqtempo l ON l.factura_id = f.id
                 INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
-                INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
+                INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
                 WHERE f.id_estado IN (16, 17)
                 AND YEAR(f.fecha_envio_iafa) IN ({years_str})
             ) AS subquery
@@ -97,11 +97,10 @@ class DataFrameLoader:
             db_table_liquidacion_facturas = f"""
             (
                 SELECT 
-                rg.ruc_proveedor,
-                rg.nro_factu
+                fp.ruc_proveedor,
+                fp.nro_factura_std as nro_factu
                 FROM factura f 
-                INNER JOIN liqtempo l ON l.factura_id = f.id
-                INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
+                INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
                 WHERE f.id_estado IN (16, 17)
                 AND YEAR(f.fecha_envio_iafa) IN ({years_str})
             ) AS subquery

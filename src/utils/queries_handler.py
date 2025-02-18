@@ -15,12 +15,12 @@ def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]) -> str:
                     WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
                     ELSE ls.code_solben
                 END as nro_solben,
-                rg.ruc_proveedor
-                FROM factura_validaciones fv
-                INNER JOIN factura f ON f.id = fv.factura_id
-                INNER JOIN liqtempo l ON f.id = l.factura_id
+                fp.ruc_proveedor
+                FROM factura f 
+                INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
+                INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+                INNER JOIN liqtempo l ON l.factura_id = f.id
                 INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
-                INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
                 WHERE fv.factura_id IN ({ids})
             ) AS subquery"""
     return query
@@ -30,14 +30,15 @@ db_table_medden_ordenes = """
 (
     SELECT 
     l.codigo_afiliado,
-    rg.mto_fact AS monto,
+    f.monto AS monto,
     CASE
         WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
         ELSE ls.code_solben
     END as nro_solben,
-    rg.ruc_proveedor
-    FROM reporte_general rg
-    INNER JOIN liqtempo l ON l.id = rg.id_liqtempo
+    fp.ruc_proveedor
+    FROM factura f
+    INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+    INNER JOIN liqtempo l ON l.factura_id = f.id
     INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
     WHERE l.id_estado IN (9, 10, 13, 15, 16, 17, 18)
     AND YEAR(l.created_at) = (SELECT YEAR(NOW()))
@@ -52,12 +53,11 @@ def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
                 SELECT 
                 fv.factura_id,
                 f.id_estado,
-                rg.ruc_proveedor, 
-                rg.nro_factu
-                FROM factura_validaciones fv
-                INNER JOIN factura f ON f.id = fv.factura_id
-                INNER JOIN liqtempo l ON l.factura_id = f.id
-                INNER JOIN reporte_general rg ON l.id = rg.id_liqtempo
+                fp.ruc_proveedor, 
+                fp.nro_factura_std as nro_factu
+                FROM factura f
+                INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
+                INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
                 WHERE fv.factura_id IN ({ids})
             ) AS subquery
             """
@@ -67,13 +67,12 @@ def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
 db_table_medden_facturas = """
 (
     SELECT 
-    rg.ruc_proveedor, 
-    rg.nro_factu
-    FROM reporte_general rg
-    INNER JOIN liqtempo l ON l.id = rg.id_liqtempo
-    INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
-    WHERE l.id_estado IN (9, 10, 13, 15, 16, 17, 18)
-    AND YEAR(l.created_at) = (SELECT YEAR(NOW()))
+    fp.ruc_proveedor, 
+    fp.nro_factura_std as nro_factu
+    FROM factura f
+    INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+    WHERE f.id_estado IN (9, 10, 13, 15, 16, 17, 18)
+    AND YEAR(f.created_at) = (SELECT YEAR(NOW()))
 ) AS subquery
 """
 
