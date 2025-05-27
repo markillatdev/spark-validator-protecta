@@ -12,6 +12,7 @@ from utils.queries_handler import (
     db_table_medden_ordenes,
     db_table_validacion_ordenes_with_ids
 )
+from utils.message_handler import MessageHandler
 
 class AttentionDuplicateHandler:
 
@@ -80,7 +81,8 @@ class AttentionDuplicateHandler:
 
                 if estado_id in Constants.ESTADOS_VALIDOS:
                     if cantidad > 1:
-                        self.invoice_updater.update_invoices_detected(self.message, factura_id, system)
+                        observation: str = MessageHandler.message_attention_duplicate(self.message, value, system)
+                        self.invoice_updater.update_invoices_detected(observation, factura_id, system)
                         print(f"Factura {factura_id} actualizada con la observación: {self.message} con estado {estado_id}")
                 else:
                     print(f"El estado {estado_id} no esta contemplado")        
