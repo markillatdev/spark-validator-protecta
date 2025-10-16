@@ -58,6 +58,7 @@ class DataFrameLoader:
                 ruc AS ruc_proveedor
                 FROM liquidacion 
                 WHERE YEAR(proceso) IN ({years_str})
+                AND frecuencia = 0
             ) AS subquery
             """
 
@@ -68,6 +69,7 @@ class DataFrameLoader:
                 nro_factu
                 FROM liquidacion 
                 WHERE YEAR(proceso) IN ({years_str})
+                AND frecuencia = 0
             ) AS subquery
             """
 
