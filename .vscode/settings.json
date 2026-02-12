@@ -2,5 +2,6 @@
     "python.analysis.extraPaths": [
         "./company/config"
     ],
-    "github.copilot.chat.scopeSelection": false
+    "github.copilot.chat.scopeSelection": false,
+    "snyk.advanced.autoSelectOrganization": true
 }
