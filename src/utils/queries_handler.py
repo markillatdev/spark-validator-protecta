@@ -41,7 +41,7 @@ db_table_medden_ordenes = """
     INNER JOIN liqtempo l ON l.factura_id = f.id
     INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
     WHERE l.id_estado IN (9, 10, 13, 15, 16, 17, 18)
-    AND YEAR(l.created_at) = (SELECT YEAR(NOW()))
+    AND YEAR(l.created_at) BETWEEN YEAR(NOW()) - 1 AND YEAR(NOW())
 ) AS subquery"""
 
 #### Invoice Duplicate ####
@@ -72,7 +72,7 @@ db_table_medden_facturas = """
     FROM factura f
     INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
     WHERE f.id_estado IN (9, 10, 13, 15, 16, 17, 18)
-    AND YEAR(f.created_at) = (SELECT YEAR(NOW()))
+    AND YEAR(f.created_at) BETWEEN YEAR(NOW()) - 1 AND YEAR(NOW())
 ) AS subquery
 """
 
