@@ -84,10 +84,8 @@ update_factura = """
         observacion = %s,
         estado_validacion_factura_id = %s,
         tipo_validacion_factura_id = %s,
-        silux_sabsa = %s,
-        silux_cobertura = %s,
-        unix_sabsa = %s,
-        unix_cobertura = %s,
+        silux_semefa = %s,
+        solben_semefa = %s,
         updated_at = NOW()
     WHERE factura_id = %s
 """
@@ -101,10 +99,8 @@ def update_factura_unique(invoiceIds: List[int]) -> str:
             observacion = %s,
             estado_validacion_factura_id = 2,
             tipo_validacion_factura_id = 2,
-            silux_sabsa = 0,
-            silux_cobertura = 0,
-            unix_sabsa = 0,
-            unix_cobertura = 0,
+            silux_semefa = 0,
+            solben_semefa = 0,
             updated_at = NOW()
         WHERE estado_validacion_factura_id = 1 
         AND tipo_validacion_factura_id = 1
@@ -121,10 +117,8 @@ def update_reset_invoices(invoiceIds: List[int]) -> str:
             observacion = %s,
             estado_validacion_factura_id = 1,
             tipo_validacion_factura_id = 1,
-            silux_sabsa = 0,
-            silux_cobertura = 0,
-            unix_sabsa = 0,
-            unix_cobertura = 0,
+            silux_semefa = 0,
+            solben_semefa = 0,
             spark_process = 0,
             updated_at = NOW()
         WHERE factura_id IN ({placeholders})

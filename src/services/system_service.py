@@ -1,7 +1,6 @@
 from typing import List
 from fastapi import HTTPException, status
-from core.sabsa_core import SabsaCore
-from core.cobertura_core import CoberturaCore
+from core.semefa_core import SemefaCore
 from utils.constants import Constants
 import logging
 
@@ -16,12 +15,9 @@ class SystemService:
 
     def operations_attention(self, invoiceIds: List[int]):
         try:
-            if self.system == Constants.SYSTEM_SILUX_SABSA:
-                sabsa = SabsaCore(self.system)
+            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+                sabsa = SemefaCore(self.system)
                 sabsa.execute_attentions(invoiceIds)
-            elif self.system == Constants.SYSTEM_SILUX_COBERTURA:
-                cobertura = CoberturaCore(self.system)
-                cobertura.execute_attentions(invoiceIds)
             else:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -43,12 +39,9 @@ class SystemService:
         
     def operations_invoices(self, invoiceIds: List[int]):
         try:
-            if self.system == Constants.SYSTEM_SILUX_SABSA:
-                sabsa = SabsaCore(self.system)
+            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+                sabsa = SemefaCore(self.system)
                 sabsa.execute_invoices(invoiceIds)
-            elif self.system == Constants.SYSTEM_SILUX_COBERTURA:
-                cobertura = CoberturaCore(self.system)
-                cobertura.execute_invoices(invoiceIds)
             else:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -70,12 +63,9 @@ class SystemService:
         
     def operations_update_invoices(self, invoiceIds: List[int]):
         try:
-            if self.system == Constants.SYSTEM_SILUX_SABSA:
-                sabsa = SabsaCore(self.system)
+            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+                sabsa = SemefaCore(self.system)
                 sabsa.execute_update_invoices(invoiceIds)
-            elif self.system == Constants.SYSTEM_SILUX_COBERTURA:
-                cobertura = CoberturaCore(self.system)
-                cobertura.execute_update_invoices(invoiceIds)
             else:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -97,12 +87,9 @@ class SystemService:
         
     def operations_update_reset_invoices(self, invoiceIds: List[int]):
         try:
-            if self.system == Constants.SYSTEM_SILUX_SABSA:
-                sabsa = SabsaCore(self.system)
+            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+                sabsa = SemefaCore(self.system)
                 sabsa.execute_reset_invoices(invoiceIds)
-            elif self.system == Constants.SYSTEM_SILUX_COBERTURA:
-                cobertura = CoberturaCore(self.system)
-                cobertura.execute_reset_invoices(invoiceIds)
             else:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,

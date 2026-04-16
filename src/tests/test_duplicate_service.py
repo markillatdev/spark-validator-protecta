@@ -15,7 +15,7 @@ def spark():
 def handler(spark):
     # Mock de la conexión a la base de datos
     mock_connection = MagicMock()
-    return AttentionDuplicateHandler(spark, mock_connection, Constants.SYSTEM_SILUX_SABSA)
+    return AttentionDuplicateHandler(spark, mock_connection, Constants.SYSTEM_SILUX_SEMEFA)
 
 def test_buscar_duplicados(spark: SparkSession, handler: AttentionDuplicateHandler):
     # Crear DataFrames simulados
@@ -39,6 +39,6 @@ def test_buscar_duplicados(spark: SparkSession, handler: AttentionDuplicateHandl
 
 def systems() -> list:
     return [
-        {"name": Constants.SYSTEM_SILUX_SABSA},
-        {"name": Constants.SYSTEM_UNIX_SABSA, "load_dataframes": True}
+        {"name": Constants.SYSTEM_SILUX_SEMEFA},
+        {"name": Constants.SYSTEM_SOLBEN_SEMEFA, "load_dataframes": True}
     ]

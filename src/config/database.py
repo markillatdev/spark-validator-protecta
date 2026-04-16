@@ -4,54 +4,27 @@ from  utils.constants import Constants
 load_dotenv()
 
 DATABASE_CONFIG = {
-    Constants.SYSTEM_SILUX_SABSA: {
-        "url": os.getenv("DB_URL_SILUX_SABSA"),
-        "host": os.getenv("DB_HOST_SILUX_SABSA"),
-        "port": int(os.getenv("DB_PORT_SILUX_SABSA")),
-        "user": os.getenv("DB_USER_SILUX_SABSA"),
-        "password": os.getenv("DB_PASSWORD_SILUX_SABSA"),
-        "database": os.getenv("DB_DATABASE_SILUX_SABSA")
+    Constants.SYSTEM_SILUX_SEMEFA: {
+        "url": os.getenv("DB_URL_SILUX_SEMEFA"),
+        "host": os.getenv("DB_HOST_SILUX_SEMEFA"),
+        "port": int(os.getenv("DB_PORT_SILUX_SEMEFA")),
+        "user": os.getenv("DB_USER_SILUX_SEMEFA"),
+        "password": os.getenv("DB_PASSWORD_SILUX_SEMEFA"),
+        "database": os.getenv("DB_DATABASE_SILUX_SEMEFA")
     },
-    Constants.SYSTEM_SILUX_COBERTURA: {
-        "url": os.getenv("DB_URL_SILUX_CM"),
-        "host": os.getenv("DB_HOST_SILUX_CM"),
-        "port": int(os.getenv("DB_PORT_SILUX_CM")),
-        "user": os.getenv("DB_USER_SILUX_CM"),
-        "password": os.getenv("DB_PASSWORD_SILUX_CM"),
-        "database": os.getenv("DB_DATABASE_SILUX_CM")
-    },
-    Constants.SYSTEM_SOLBEN_SABSA: {
-        "url": os.getenv("DB_URL_SOLBEN_SABSA"),
-        "user": os.getenv("DB_USER_SOLBEN_SABSA"),
-        "password": os.getenv("DB_PASSWORD_SOLBEN_SABSA")
-    },
-    Constants.SYSTEM_SOLBEN_COBERTURA: {
-        "url": os.getenv("DB_URL_SOLBEN_CM"),
-        "user": os.getenv("DB_USER_SOLBEN_CM"),
-        "password": os.getenv("DB_PASSWORD_SOLBEN_CM")
-    },
-     Constants.SYSTEM_UNIX_SABSA: {
-        "url": os.getenv("DB_URL_SOLBEN_SABSA"),
-        "user": os.getenv("DB_USER_SOLBEN_SABSA"),
-        "password": os.getenv("DB_PASSWORD_SOLBEN_SABSA")
-    },
-    Constants.SYSTEM_UNIX_COBERTURA: {
-        "url": os.getenv("DB_URL_SOLBEN_CM"),
-        "user": os.getenv("DB_USER_SOLBEN_CM"),
-        "password": os.getenv("DB_PASSWORD_SOLBEN_CM")
+    Constants.SYSTEM_SOLBEN_SEMEFA: {
+        "url": os.getenv("DB_URL_SOLBEN_SEMEFA"),
+        "user": os.getenv("DB_USER_SOLBEN_SEMEFA"),
+        "password": os.getenv("DB_PASSWORD_SOLBEN_SEMEFA")
     }
 }
 
 PARQUET_ATTENTIONS_PATHS = {
-    Constants.SYSTEM_UNIX_SABSA: f'{os.getenv("STORAGE_PATH")}/attentions/{Constants.SYSTEM_UNIX_SABSA}/*.parquet',
-    Constants.SYSTEM_UNIX_COBERTURA: f'{os.getenv("STORAGE_PATH")}/attentions/{Constants.SYSTEM_UNIX_COBERTURA}/*.parquet',
-    Constants.SYSTEM_SILUX_SABSA: f'{os.getenv("STORAGE_PATH")}/attentions/{Constants.SYSTEM_SILUX_SABSA}/*.parquet',
-    Constants.SYSTEM_SILUX_COBERTURA: f'{os.getenv("STORAGE_PATH")}/attentions/{Constants.SYSTEM_SILUX_COBERTURA}/*.parquet'
+    Constants.SYSTEM_SOLBEN_SEMEFA: f'{os.getenv("STORAGE_PATH")}/attentions/{Constants.SYSTEM_SOLBEN_SEMEFA}/*.parquet',
+    Constants.SYSTEM_SILUX_SEMEFA: f'{os.getenv("STORAGE_PATH")}/attentions/{Constants.SYSTEM_SILUX_SEMEFA}/*.parquet',
 }
 
 PARQUET_INVOICES_PATHS = {
-    Constants.SYSTEM_UNIX_SABSA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_UNIX_SABSA}/*.parquet',
-    Constants.SYSTEM_UNIX_COBERTURA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_UNIX_COBERTURA}/*.parquet',
-    Constants.SYSTEM_SILUX_SABSA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_SILUX_SABSA}/*.parquet',
-    Constants.SYSTEM_SILUX_COBERTURA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_SILUX_COBERTURA}/*.parquet'
+    Constants.SYSTEM_SOLBEN_SEMEFA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_SOLBEN_SEMEFA}/*.parquet',
+    Constants.SYSTEM_SILUX_SEMEFA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_SILUX_SEMEFA}/*.parquet',
 }

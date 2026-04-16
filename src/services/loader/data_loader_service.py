@@ -35,7 +35,7 @@ class DataFrameLoader:
     def load_data(self, years: List[int], origen: str) -> responseBasicSchema:
         years_str = ", ".join(str(year) for year in years)
         years_text = "_".join(str(year) for year in years)
-        if not origen in {Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA, Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA}:
+        if not origen in {Constants.SYSTEM_SOLBEN_SEMEFA, Constants.SYSTEM_SILUX_SEMEFA}:
             return {"msg": f"No existe el sistema {origen}", "success": False}
         db_table_liquidacion_ordenes, db_table_liquidacion_facturas = self.querys(years_str, origen)
         if not db_table_liquidacion_ordenes or not db_table_liquidacion_facturas:
@@ -47,7 +47,7 @@ class DataFrameLoader:
 
     def querys(self, years_str: str, origen: str) -> str:
 
-        if origen in {Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA}:
+        if origen in {Constants.SYSTEM_SOLBEN_SEMEFA}:
 
             db_table_liquidacion_ordenes = f"""
             (
@@ -75,7 +75,7 @@ class DataFrameLoader:
 
             return db_table_liquidacion_ordenes, db_table_liquidacion_facturas
         
-        elif origen in {Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA}:
+        elif origen in {Constants.SYSTEM_SILUX_SEMEFA}:
 
             db_table_liquidacion_ordenes = f"""
             (
@@ -115,7 +115,7 @@ class DataFrameLoader:
 
 
     def destroy_dataframe(self, origen: str):
-        if origen not in {Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA, Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA}:
+        if origen not in {Constants.SYSTEM_SOLBEN_SEMEFA, Constants.SYSTEM_SILUX_SEMEFA}:
             return {"msg": f"No existe el sistema {origen}", "success": False}
         resources = {"attentions", "invoices"}
         for resource in resources:

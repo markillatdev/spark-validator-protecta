@@ -36,8 +36,7 @@ class testDataframeService:
     
     def systems(self):
         return [
-            {"name": Constants.SYSTEM_UNIX_SABSA, "load_dataframes": True},
-            {"name": Constants.SYSTEM_UNIX_COBERTURA, "load_dataframes": True}
+            {"name": Constants.SYSTEM_SOLBEN_SEMEFA, "load_dataframes": True}
         ]
 
     def buscar_duplicados(self, df_facturas_filtradas: DataFrame, df_facturas_buscar: DataFrame):

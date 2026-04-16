@@ -79,7 +79,7 @@ class DataFrameSchema(BaseModel):
         schema_extra = {
             "ejemplo": {
                 "years": [2019, 2020],
-                "origen": [Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA, Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA]
+                "origen": [Constants.SYSTEM_SILUX_SEMEFA, Constants.SYSTEM_SOLBEN_SEMEFA]
             }
         }
 
@@ -89,7 +89,7 @@ class DestroyDataFrameSchema(BaseModel):
     class Config:
         schema_extra = {
             "ejemplo": {
-                "origen": [Constants.SYSTEM_SILUX_SABSA, Constants.SYSTEM_SILUX_COBERTURA, Constants.SYSTEM_UNIX_SABSA, Constants.SYSTEM_UNIX_COBERTURA]
+                "origen": [Constants.SYSTEM_SILUX_SEMEFA, Constants.SYSTEM_SOLBEN_SEMEFA]
             }
         }
 
