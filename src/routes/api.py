@@ -22,12 +22,12 @@ async def validateInternalAttentionDuplicateImport(schema: InvoiceSchema,request
     service = SystemService(request.headers.get("system"))
     return service.operations_attention(schema.invoiceIds)
 
-@router.post("/validate-taxtypes-import-duplicate", status_code=status.HTTP_200_OK, response_model=responseSchema)
+@router.post("/validate-taxtypes-duplicate", status_code=status.HTTP_200_OK, response_model=responseSchema)
 async def validateInternalTaxTypeDuplicateImport(schema: InvoiceSchema,request: Request, token: str = Depends(verify_token)):
     service = SystemService(request.headers.get("system"))
     return service.operations_taxtypes(schema.invoiceIds)
 
-@router.post("/validate-amounts-import-duplicate", status_code=status.HTTP_200_OK, response_model=responseSchema)
+@router.post("/validate-amounts-duplicate", status_code=status.HTTP_200_OK, response_model=responseSchema)
 async def validateInternalAmountDuplicateImport(schema: InvoiceSchema,request: Request, token: str = Depends(verify_token)):
     service = SystemService(request.headers.get("system"))
     return service.operations_amounts(schema.invoiceIds)

@@ -81,7 +81,7 @@ class TaxTypeDuplicateHandler:
 
                 if estado_id in Constants.ESTADOS_VALIDOS:
                     if cantidad > 1:
-                        observation: str = MessageHandler.message_attention_duplicate(self.message, value, system)
+                        observation: str = MessageHandler.message_taxtype_duplicate(self.message, value, system)
                         self.invoice_updater.update_invoices_detected(observation, factura_id, system)
                         print(f"Factura {factura_id} actualizada con la observación: {self.message} con estado {estado_id}")
                 else:
