@@ -5,6 +5,8 @@ from pymysql.connections import Connection
 
 def create_db_connection(system: str) -> Connection:
     config = DATABASE_CONFIG.get(system)
+    if config is None:
+        return None
     connection = pymysql.connect(
         host=config["host"],
         port=config["port"],
@@ -16,6 +18,8 @@ def create_db_connection(system: str) -> Connection:
     
 def read_table_from_db(spark: SparkSession, db_table: str, system: str) -> DataFrame:
     config = DATABASE_CONFIG.get(system)
+    if config is None:
+        return None
     return spark.read.format("jdbc").options(
         url=config['url'],
         driver="com.mysql.cj.jdbc.Driver",

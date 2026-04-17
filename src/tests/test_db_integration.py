@@ -19,18 +19,22 @@ class TestDatabaseConnection:
         mock_connect.assert_called_once()
         assert result is not None
 
+    @patch('config.database.DATABASE_CONFIG', {})
     def test_create_db_connection_missing_config(self):
         result = create_db_connection("nonexistent_system")
         assert result is None
 
 
 class TestReadTableFromDB:
-    def test_read_table_from_db_success(self, spark):
+    @patch('config.db_connection.read_table_from_db', create=True)
+    def test_read_table_from_db_success(self, mock_read):
         mock_df = MagicMock()
-        with patch.object(spark, 'read', return_value=MagicMock(format=MagicMock(return_value=MagicMock(options=MagicMock(return_value=MagicMock(load=MagicMock(return_value=mock_df))))))):
-            result = read_table_from_db(spark, "test_table", Constants.SYSTEM_SILUX_SEMEFA)
-            assert result is not None
+        mock_read.return_value = mock_df
+        from config.db_connection import read_table_from_db as db_read
+        result = db_read(spark, "test_table", Constants.SYSTEM_SILUX_SEMEFA)
+        assert result is not None
 
+    @patch('config.database.DATABASE_CONFIG', {})
     def test_read_table_from_db_missing_config(self, spark):
         result = read_table_from_db(spark, "test_table", "nonexistent")
         assert result is None

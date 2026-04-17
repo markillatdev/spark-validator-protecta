@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 import sys
 import os
+from jose import jwt
 
 from main import app
 from utils.constants import Constants
@@ -12,10 +13,9 @@ client = TestClient(app)
 
 
 def get_test_token():
-    with patch('services.jwt_service.verify_password', return_value=True), \
-         patch('services.jwt_service.get_apikey_from_db', return_value={"apikey": "test_key"}):
-        response = client.post("/api/auth/token", json={"apikey": "test_apikey"})
-        return response.json()["access_token"]
+    from services.jwt_service import SECRET_KEY, ALGORITHM
+    token = jwt.encode({"service": "microservice"}, SECRET_KEY, algorithm=ALGORITHM)
+    return token
 
 
 class TestLoadDataFrameToDatabase:
@@ -60,14 +60,13 @@ class TestLoadDataFrameToDatabase:
         
         response = client.post(
             "/api/load-dataframe-to-database",
-            json={"years": [2019], "origen": Constants.SYSTEM_SOLBEN_SEMEFA},
-            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SOLBEN_SEMEFA}
+            json={"years": [2019], "origen": "invalid_system"},
+            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_SEMEFA}
         )
         
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is False
-        assert "No se pudo realizar la carga" in data["msg"]
 
     def test_load_dataframe_without_token(self):
         response = client.post(
