@@ -104,7 +104,7 @@ class InvoiceDuplicateHandler:
 
     def createDataFrameInvoice(self, df_facturas_buscar: DataFrame) -> DataFrame:
         query_results = df_facturas_buscar.collect()
-        data = [(row['ruc_proveedor'], row['nro_factu']) for row in query_results]
+        data = [(row['ruc_proveedor'], row['nro_factu'], row['factura_id']) for row in query_results]
         schema = StructType([
             StructField("ruc_proveedor", StringType(), True),
             StructField("nro_factu", StringType(), True),
