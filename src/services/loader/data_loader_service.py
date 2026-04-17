@@ -23,31 +23,36 @@ class DataFrameLoader:
         spark = create_spark_session()
         load_or_create_parquet(spark, db_table, filename, origen)
 
-
     def load_attention(self, year: int, db_table_liquidacion_ordenes: str, origen: str):
         self.load_resources(year, db_table_liquidacion_ordenes, "attentions", origen)
-
 
     def load_invoices(self, year: int, db_table_liquidacion_facturas: str, origen: str):
         self.load_resources(year, db_table_liquidacion_facturas, "invoices", origen)
 
+    def load_tax_type(self, year: int, db_table_liquidacion_tipo_impuesto: str, origen: str):
+        self.load_resources(year, db_table_liquidacion_tipo_impuesto, "tax_type", origen)
+
+    def load_amount(self, year: int, db_table_liquidacion_importe: str, origen: str):
+        self.load_resources(year, db_table_liquidacion_importe, "amount", origen)
 
     def load_data(self, years: List[int], origen: str) -> responseBasicSchema:
         years_str = ", ".join(str(year) for year in years)
         years_text = "_".join(str(year) for year in years)
         if not origen in {Constants.SYSTEM_SOLBEN_SEMEFA, Constants.SYSTEM_SILUX_SEMEFA}:
             return {"msg": f"No existe el sistema {origen}", "success": False}
-        db_table_liquidacion_ordenes, db_table_liquidacion_facturas = self.querys(years_str, origen)
-        if not db_table_liquidacion_ordenes or not db_table_liquidacion_facturas:
+        db_table_liquidacion_ordenes, db_table_liquidacion_facturas, db_table_liquidacion_tipo_impuesto, db_table_liquidacion_importe = self.querys(years_str, origen)
+        if not db_table_liquidacion_ordenes or not db_table_liquidacion_facturas or not db_table_liquidacion_tipo_impuesto or not db_table_liquidacion_importe:
             return {"msg": "No se pudo realizar la carga", "success": False}
         self.load_attention(years_text, db_table_liquidacion_ordenes, origen)
         self.load_invoices(years_text, db_table_liquidacion_facturas, origen)
+        self.load_tax_type(years_text, db_table_liquidacion_tipo_impuesto, origen)
+        self.load_amount(years_text, db_table_liquidacion_importe, origen)
         return {"msg": "Datos cargados exitosamente", "success": True}
 
 
     def querys(self, years_str: str, origen: str) -> str:
 
-        if origen in {Constants.SYSTEM_SOLBEN_SEMEFA}:
+        if origen == Constants.SYSTEM_SOLBEN_SEMEFA:
 
             db_table_liquidacion_ordenes = f"""
             (
@@ -73,9 +78,35 @@ class DataFrameLoader:
             ) AS subquery
             """
 
-            return db_table_liquidacion_ordenes, db_table_liquidacion_facturas
+            db_table_liquidacion_tipo_impuesto = f"""
+            (
+                SELECT
+                CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
+                nro_soli AS nro_solben,
+                ruc AS ruc_proveedor,
+                tipo_impuesto
+                FROM liquidacion 
+                WHERE YEAR(proceso) IN ({years_str})
+                AND frecuencia = 0
+            )
+            """
+
+            db_table_liquidacion_importe = f"""
+            (
+                SELECT
+                CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
+                tot_clini AS monto,
+                ruc AS ruc_proveedor,
+                tipo_impuesto
+                FROM liquidacion 
+                WHERE YEAR(proceso) IN ({years_str})
+                AND frecuencia = 0            
+            )
+            """
+
+            return db_table_liquidacion_ordenes, db_table_liquidacion_facturas, db_table_liquidacion_tipo_impuesto, db_table_liquidacion_importe
         
-        elif origen in {Constants.SYSTEM_SILUX_SEMEFA}:
+        elif origen == Constants.SYSTEM_SILUX_SEMEFA:
 
             db_table_liquidacion_ordenes = f"""
             (
@@ -108,7 +139,43 @@ class DataFrameLoader:
             ) AS subquery
             """
 
-            return db_table_liquidacion_ordenes, db_table_liquidacion_facturas
+            db_table_liquidacion_tipo_impuesto = f"""
+            (
+            
+                SELECT 
+                l.codigo_afiliado,
+                CASE
+                    WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
+                    ELSE ls.code_solben
+                END as nro_solben,
+                fp.ruc_proveedor,
+                l.tipo_impuesto_id as tipo_impuesto 
+                FROM factura f
+                INNER JOIN liqtempo l ON l.factura_id = f.id
+                INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
+                INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+                WHERE f.id_estado IN (16, 17)
+                AND YEAR(f.fecha_envio_iafa) IN ({years_str})
+            )
+            """
+
+            db_table_liquidacion_importe = f"""
+            (
+                SELECT 
+                l.codigo_afiliado,
+                f.monto,
+                fp.ruc_proveedor,
+                l.tipo_impuesto_id as tipo_impuesto 
+                FROM factura f
+                INNER JOIN liqtempo l ON l.factura_id = f.id
+                INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
+                INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+                WHERE f.id_estado IN (16, 17)
+                AND YEAR(f.fecha_envio_iafa) IN ({years_str})
+            )
+            """
+
+            return db_table_liquidacion_ordenes, db_table_liquidacion_facturas, db_table_liquidacion_tipo_impuesto, db_table_liquidacion_importe
 
         else:
             return "", ""
@@ -117,7 +184,7 @@ class DataFrameLoader:
     def destroy_dataframe(self, origen: str):
         if origen not in {Constants.SYSTEM_SOLBEN_SEMEFA, Constants.SYSTEM_SILUX_SEMEFA}:
             return {"msg": f"No existe el sistema {origen}", "success": False}
-        resources = {"attentions", "invoices"}
+        resources = {"attentions", "invoices", "tax_type", "amount"}
         for resource in resources:
             directory = f"{resource}/{origen}"
             path = os.path.join(os.getenv("STORAGE_PATH"), directory)

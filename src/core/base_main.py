@@ -3,6 +3,8 @@ from config.spark_config import create_spark_session
 from config.db_connection import create_db_connection
 from services.validate.attention_duplicate_service import AttentionDuplicateHandler
 from services.validate.invoice_duplicate_service import InvoiceDuplicateHandler
+from services.validate.taxtype_duplicate_service import TaxTypeDuplicateHandler
+from services.validate.amount_duplicate_service import AmountDuplicateHandler
 from services.validate.update_service import InvoiceUpdate
 from dotenv import load_dotenv # type: ignore
 load_dotenv()
@@ -26,6 +28,20 @@ class BaseMain:
         connection = create_db_connection(self.system)
         invoice = InvoiceDuplicateHandler(spark, connection, self.system)
         invoice.procesar_facturas(systems_validate, invoiceIds)
+
+
+    def validate_taxtype(self, systems_validate: List[str], invoiceIds: List[int]):
+        spark = create_spark_session()     
+        connection = create_db_connection(self.system)
+        taxtype = TaxTypeDuplicateHandler(spark, connection, self.system)
+        taxtype.procesar_tipo_impuesto(systems_validate, invoiceIds)    
+        
+    
+    def validate_amount(self, systems_validate: List[str], invoiceIds: List[int]):
+        spark = create_spark_session()     
+        connection = create_db_connection(self.system)
+        amount = AmountDuplicateHandler(spark, connection, self.system)
+        amount.procesar_montos(systems_validate, invoiceIds)
 
 
     def update_invoices_unique(self, invoiceIds: List[int]):

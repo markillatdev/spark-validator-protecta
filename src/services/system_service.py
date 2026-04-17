@@ -60,6 +60,54 @@ class SystemService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Hubo un error"
             )    
+
+    def operations_taxtypes(self, invoiceIds: List[int]):
+        try:
+            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+                sabsa = SemefaCore(self.system)
+                sabsa.execute_taxtypes(invoiceIds)
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Sistema '{self.system}' no encontrado"
+                )
+            return {"msg": "La operación ha sido ejecutada", "success": True, "total": len(invoiceIds)}
+        except HTTPException as ex:
+            logger.error(f"HTTPException en operations_taxtypes: {ex.detail}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=ex.detail
+            )    
+        except Exception as ex:
+            logger.error(f"Error inesperado en operations_taxtypes: {str(ex)}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Hubo un error"
+            )
+
+    def operations_amounts(self, invoiceIds: List[int]):
+        try:
+            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+                sabsa = SemefaCore(self.system)
+                sabsa.execute_amounts(invoiceIds)
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Sistema '{self.system}' no encontrado"
+                )
+            return {"msg": "La operación ha sido ejecutada", "success": True, "total": len(invoiceIds)}
+        except HTTPException as ex:
+            logger.error(f"HTTPException en operations_amounts: {ex.detail}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=ex.detail
+            )    
+        except Exception as ex:
+            logger.error(f"Error inesperado en operations_amounts: {str(ex)}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Hubo un error"
+            )
         
     def operations_update_invoices(self, invoiceIds: List[int]):
         try:

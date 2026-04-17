@@ -20,6 +20,12 @@ class SemefaCore(BaseMain):
     def execute_invoices(self, invoiceIds: List[int]):
         self.validate_invoices(self.systems(), invoiceIds)
 
+    def execute_taxtypes(self, invoiceIds: List[int]):
+        self.validate_taxtype(self.systems(), invoiceIds)
+
+    def execute_amounts(self, invoiceIds: List[int]):
+        self.validate_amount(self.systems(), invoiceIds)
+    
     def execute_update_invoices(self, invoiceIds: List[int]):
         self.update_invoices_unique(invoiceIds)
 

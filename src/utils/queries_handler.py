@@ -76,6 +76,86 @@ db_table_medden_facturas = """
 ) AS subquery
 """
 
+#### TaxType Duplicate ####
+
+def db_table_validacion_taxtypes_with_ids(invoiceIds: List[int]) -> str:
+    ids = ', '.join(map(str, invoiceIds)) 
+    query = f"""
+            (
+                SELECT 
+                fv.factura_id,
+                f.id_estado,
+                l.codigo_afiliado,
+                CASE
+                    WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
+                    ELSE ls.code_solben
+                END as nro_solben,
+                fp.ruc_proveedor,
+                l.tipo_impuesto_id as tipo_impuesto
+                FROM factura f 
+                INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
+                INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+                INNER JOIN liqtempo l ON l.factura_id = f.id
+                INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
+                WHERE fv.factura_id IN ({ids})
+            ) AS subquery"""
+    return query
+
+db_table_medden_impuestos = """
+(
+    SELECT 
+    l.codigo_afiliado,
+    CASE
+        WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
+        ELSE ls.code_solben
+    END as nro_solben,
+    fp.ruc_proveedor,
+    l.tipo_impuesto_id as tipo_impuesto
+    FROM factura f
+    INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+    INNER JOIN liqtempo l ON l.factura_id = f.id
+    INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
+    WHERE l.id_estado IN (9, 10, 13, 15, 16, 17, 18)
+    AND YEAR(l.created_at) BETWEEN YEAR(NOW()) - 1 AND YEAR(NOW())
+) AS subquery"""
+
+#### Amount Duplicate ####
+
+def db_table_validacion_amount_with_ids(invoiceIds: List[int]) -> str:
+    ids = ', '.join(map(str, invoiceIds)) 
+    query = f"""
+            (
+                SELECT 
+                fv.factura_id,
+                f.id_estado,
+                l.codigo_afiliado,
+                f.monto,
+                fp.ruc_proveedor,
+                l.tipo_impuesto_id as tipo_impuesto
+                FROM factura f 
+                INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
+                INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+                INNER JOIN liqtempo l ON l.factura_id = f.id
+                INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
+                WHERE fv.factura_id IN ({ids})
+            ) AS subquery"""
+    return query
+
+db_table_medden_montos = """
+(
+    SELECT 
+    l.codigo_afiliado,
+    f.monto as monto,
+    fp.ruc_proveedor,
+    l.tipo_impuesto_id as tipo_impuesto
+    FROM factura f
+    INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+    INNER JOIN liqtempo l ON l.factura_id = f.id
+    INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
+    WHERE l.id_estado IN (9, 10, 13, 15, 16, 17, 18)
+    AND YEAR(l.created_at) BETWEEN YEAR(NOW()) - 1 AND YEAR(NOW())
+) AS subquery"""
+
 ## Update
 
 update_factura = """
