@@ -1,6 +1,6 @@
 import os
 from typing import List
-from pyspark.sql.functions import col # type: ignore
+from pyspark.sql.functions import col, collect_list, count
 from config.database import PARQUET_ATTENTIONS_PATHS
 from config.db_connection import read_table_from_db
 from services.validate.update_service import InvoiceUpdate
@@ -53,7 +53,10 @@ class AttentionDuplicateHandler:
                 how="inner"
             )
 
-            df_facturas_filtradas = df_facturas_filtradas.groupBy("codigo_afiliado", "monto", "nro_solben", "ruc_proveedor").count()
+            df_facturas_filtradas = df_facturas_filtradas.groupBy("codigo_afiliado", "monto", "nro_solben", "ruc_proveedor").agg(
+                count("factura_id").alias("count"),
+                collect_list("factura_id").alias("factura_ids"),
+            )
 
             self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
         
@@ -66,6 +69,7 @@ class AttentionDuplicateHandler:
             nro_solben = row['nro_solben']
             ruc_proveedor = row['ruc_proveedor']
             cantidad = row['count']
+            factura_ids = row['factura_ids']
             
             facturas_encontradas = df_facturas_buscar.filter(
                 (col("codigo_afiliado") == codigo_afiliado) & 
@@ -75,14 +79,20 @@ class AttentionDuplicateHandler:
 
             facturas_lists = facturas_encontradas.collect()
 
+            factura_ids_unicos = list(set(factura_ids))
+
             for value in facturas_lists:
                 factura_id = value["factura_id"]
                 estado_id = value['id_estado']
 
                 if estado_id in Constants.ESTADOS_VALIDOS:
                     if cantidad > 1:
+                        factura_ids_filtrados = [
+                            item for item in factura_ids_unicos
+                            if not (not isinstance(item, list) and int(item) == int(factura_id))
+                        ]                        
                         observation: str = MessageHandler.message_attention_duplicate(self.message, value, system)
-                        self.invoice_updater.update_invoices_detected(observation, factura_id, system)
+                        self.invoice_updater.update_invoices_detected(observation, factura_id, system, factura_ids_filtrados)
                         print(f"Factura {factura_id} actualizada con la observación: {self.message} con estado {estado_id}")
                 else:
                     print(f"El estado {estado_id} no esta contemplado")        
@@ -103,6 +113,7 @@ class AttentionDuplicateHandler:
             StructField("codigo_afiliado", StringType(), True),
             StructField("monto", StringType(), True),
             StructField("nro_solben", StringType(), True),
-            StructField("ruc_proveedor", StringType(), True)
+            StructField("ruc_proveedor", StringType(), True),
+            StructField("factura_id", StringType(), True)
         ])
         return self.spark.createDataFrame(data, schema)

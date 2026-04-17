@@ -70,6 +70,7 @@ class DataFrameLoader:
             db_table_liquidacion_ordenes = f"""
             (
                 SELECT
+                silux_factura_id AS factura_id,
                 CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
                 tot_clini AS monto,
                 nro_soli AS nro_solben,
@@ -83,6 +84,7 @@ class DataFrameLoader:
             db_table_liquidacion_facturas = f"""
             (
                 SELECT
+                silux_factura_id AS factura_id,
                 ruc as ruc_proveedor,
                 nro_factu
                 FROM liquidacion 
@@ -94,6 +96,7 @@ class DataFrameLoader:
             db_table_liquidacion_tipo_impuesto = f"""
             (
                 SELECT
+                silux_factura_id AS factura_id,
                 CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
                 nro_soli AS nro_solben,
                 ruc AS ruc_proveedor,
@@ -107,6 +110,7 @@ class DataFrameLoader:
             db_table_liquidacion_importe = f"""
             (
                 SELECT
+                silux_factura_id AS factura_id,
                 CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
                 tot_clini AS monto,
                 ruc AS ruc_proveedor,
@@ -124,6 +128,7 @@ class DataFrameLoader:
             db_table_liquidacion_ordenes = f"""
             (
                 SELECT 
+                f.id AS factura_id,
                 l.codigo_afiliado,
                 f.monto,
                 CASE
@@ -142,7 +147,8 @@ class DataFrameLoader:
 
             db_table_liquidacion_facturas = f"""
             (
-                SELECT 
+                SELECT
+                f.id AS factura_id,
                 fp.ruc_proveedor,
                 fp.nro_factura_std as nro_factu
                 FROM factura f 
@@ -155,7 +161,8 @@ class DataFrameLoader:
             db_table_liquidacion_tipo_impuesto = f"""
             (
             
-                SELECT 
+                SELECT
+                f.id AS factura_id,
                 l.codigo_afiliado,
                 CASE
                     WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
@@ -174,7 +181,8 @@ class DataFrameLoader:
 
             db_table_liquidacion_importe = f"""
             (
-                SELECT 
+                SELECT
+                f.id AS factura_id,
                 l.codigo_afiliado,
                 f.monto,
                 fp.ruc_proveedor,

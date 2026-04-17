@@ -5,7 +5,9 @@ from utils.queries_handler import (
     update_factura,
     update_factura_unique,
     update_reset_invoices,
-    update_spark_processing)
+    update_spark_processing,
+    insert_factura_validacion_duplicados,
+    get_factura_validacion_id)
 
 class InvoiceUpdate:
 
@@ -13,7 +15,7 @@ class InvoiceUpdate:
         self.connection = connection
 
 
-    def update_invoices_detected(self, message: str, factura_id: int, system: str):
+    def update_invoices_detected(self, message: str, factura_id: int, system: str, factura_ids: List[int]):
         cursor = self.connection.cursor()
         try:
             cursor.execute(update_factura, (
@@ -22,6 +24,16 @@ class InvoiceUpdate:
                 1 if system == Constants.SYSTEM_SOLBEN_SEMEFA else 0,
                 factura_id
             ))
+            if factura_ids:
+                cursor.execute(get_factura_validacion_id, (factura_id,))
+                result = cursor.fetchone()
+                factura_validacion_id = result[0] if result else None
+
+                data = [(fid, factura_validacion_id) for fid in factura_ids]
+                query, values = insert_factura_validacion_duplicados(data)
+
+                for v in values:
+                    cursor.execute(query, v)
             self.connection.commit()
         except Exception as e:
             print(f"Error actualizando factura {factura_id}: {e}")

@@ -28,7 +28,8 @@ def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]) -> str:
 
 db_table_medden_ordenes = """
 (
-    SELECT 
+    SELECT
+    f.id AS factura_id,
     l.codigo_afiliado,
     f.monto AS monto,
     CASE
@@ -66,7 +67,8 @@ def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
 
 db_table_medden_facturas = """
 (
-    SELECT 
+    SELECT
+    f.id AS factura_id,
     fp.ruc_proveedor, 
     fp.nro_factura_std as nro_factu
     FROM factura f
@@ -103,7 +105,8 @@ def db_table_validacion_taxtypes_with_ids(invoiceIds: List[int]) -> str:
 
 db_table_medden_impuestos = """
 (
-    SELECT 
+    SELECT
+    f.id AS factura_id,
     l.codigo_afiliado,
     CASE
         WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
@@ -143,7 +146,8 @@ def db_table_validacion_amount_with_ids(invoiceIds: List[int]) -> str:
 
 db_table_medden_montos = """
 (
-    SELECT 
+    SELECT
+    f.id AS factura_id,
     l.codigo_afiliado,
     f.monto as monto,
     fp.ruc_proveedor,
@@ -169,6 +173,25 @@ update_factura = """
         updated_at = NOW()
     WHERE factura_id = %s
 """
+
+def insert_factura_validacion_duplicados(data):
+    query = """
+    INSERT INTO factura_validacion_duplicados (
+        factura_id, 
+        factura_validacion_id,
+        created_at,
+        updated_at
+    )
+    SELECT %s, %s, NOW(), NOW()
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM factura_validacion_duplicados
+        WHERE factura_id = %s
+          AND factura_validacion_id = %s
+    )
+    """
+    values = [(fid, fvid, fid, fvid) for fid, fvid in data]
+    return query, values
 
 
 def update_factura_unique(invoiceIds: List[int]) -> str:
@@ -219,3 +242,8 @@ def update_spark_processing(invoiceIds: List[int]) -> str:
         AND fv.factura_id IN ({placeholders})
     """
     return query
+
+
+get_factura_validacion_id = """
+    SELECT id FROM factura_validaciones WHERE factura_id = %s
+"""
