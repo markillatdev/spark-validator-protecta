@@ -99,6 +99,6 @@ class GetRecordsSchema(BaseModel):
     class Config:
         schema_extra = {
             "ejemplo": {
-                "repository": ["unix_sabsa", "unix_cobertura"],
+                "repository": ["silux_semefa", "solben_semefa"],
             }
         }
