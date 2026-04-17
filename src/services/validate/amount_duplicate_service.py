@@ -1,7 +1,7 @@
 import os
 from typing import List
 from pyspark.sql.functions import col # type: ignore
-from config.database import PARQUET_ATTENTIONS_PATHS
+from config.database import PARQUET_AMOUNT_PATHS
 from config.db_connection import read_table_from_db
 from services.validate.update_service import InvoiceUpdate
 from pyspark.sql import SparkSession, DataFrame
@@ -89,7 +89,7 @@ class AmountDuplicateHandler:
 
 
     def load_dataframes(self, system: str):
-        path = PARQUET_ATTENTIONS_PATHS.get(system)
+        path = PARQUET_AMOUNT_PATHS.get(system)
         directory = os.path.dirname(path)
         if not os.path.exists(directory):
             return None

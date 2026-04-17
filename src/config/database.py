@@ -28,3 +28,13 @@ PARQUET_INVOICES_PATHS = {
     Constants.SYSTEM_SOLBEN_SEMEFA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_SOLBEN_SEMEFA}/*.parquet',
     Constants.SYSTEM_SILUX_SEMEFA: f'{os.getenv("STORAGE_PATH")}/invoices/{Constants.SYSTEM_SILUX_SEMEFA}/*.parquet',
 }
+
+PARQUET_TAXTYPE_PATHS = {
+    Constants.SYSTEM_SOLBEN_SEMEFA: f'{os.getenv("STORAGE_PATH")}/taxtypes/{Constants.SYSTEM_SOLBEN_SEMEFA}/*.parquet',
+    Constants.SYSTEM_SILUX_SEMEFA: f'{os.getenv("STORAGE_PATH")}/taxtypes/{Constants.SYSTEM_SILUX_SEMEFA}/*.parquet',
+}
+
+PARQUET_AMOUNT_PATHS = {
+    Constants.SYSTEM_SOLBEN_SEMEFA: f'{os.getenv("STORAGE_PATH")}/amounts/{Constants.SYSTEM_SOLBEN_SEMEFA}/*.parquet',
+    Constants.SYSTEM_SILUX_SEMEFA: f'{os.getenv("STORAGE_PATH")}/amounts/{Constants.SYSTEM_SILUX_SEMEFA}/*.parquet',
+}
