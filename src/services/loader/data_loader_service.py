@@ -132,9 +132,10 @@ class DataFrameLoader:
                 l.codigo_afiliado,
                 f.monto,
                 CASE
-                    WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
-                    ELSE ls.code_solben
-                END as nro_solben,
+                    WHEN LENGTH(l.numero_segunda_solicitud) = 8
+                    THEN l.numero_segunda_solicitud
+                    ELSE l.numero_de_solben
+                END AS nro_solben,
                 fp.ruc_proveedor
                 FROM factura f
                 INNER JOIN liqtempo l ON l.factura_id = f.id
@@ -160,14 +161,14 @@ class DataFrameLoader:
 
             db_table_liquidacion_tipo_impuesto = f"""
             (
-            
                 SELECT
                 f.id AS factura_id,
                 l.codigo_afiliado,
                 CASE
-                    WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
-                    ELSE ls.code_solben
-                END as nro_solben,
+                    WHEN LENGTH(l.numero_segunda_solicitud) = 8
+                    THEN l.numero_segunda_solicitud
+                    ELSE l.numero_de_solben
+                END AS nro_solben,
                 fp.ruc_proveedor,
                 l.tipo_impuesto_id as tipo_impuesto 
                 FROM factura f
