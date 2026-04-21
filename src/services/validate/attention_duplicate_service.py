@@ -22,7 +22,7 @@ class AttentionDuplicateHandler:
         self.connection = connection
         self.invoice_updater = InvoiceUpdate(connection)
         self.coreSystem = coreSystem
-        self.message = "Atencion duplicada"
+        self.message = "Duplicidad Caso 2"
     
 
     def procesar_atenciones(self, systems_validate: List[str], invoiceIds: List[int]):
@@ -95,7 +95,7 @@ class AttentionDuplicateHandler:
                             item for item in factura_ids_unicos
                             if not (not isinstance(item, list) and int(item) == int(factura_id))
                         ]                        
-                        observation: str = MessageHandler.message_attention_duplicate(self.message, value, system)
+                        observation: str = MessageHandler.message_case_2(self.message, value, system)
                         self.invoice_updater.update_invoices_detected(observation, factura_id, system, factura_ids_filtrados)
                         print(f"Factura {factura_id} actualizada con la observación: {self.message} con estado {estado_id}")
                 else:
