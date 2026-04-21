@@ -19,16 +19,17 @@ def handler(spark):
     return AttentionDuplicateHandler(spark, mock_connection, Constants.SYSTEM_SILUX_SEMEFA)
 
 def test_buscar_duplicados(spark: SparkSession, handler: AttentionDuplicateHandler):
+    from datetime import date
     df_facturas_buscar = spark.createDataFrame([
-        Row(codigo_afiliado="123", monto=100.0, nro_solben="001", ruc_proveedor="ABC", factura_id=1, id_estado=9)
+        Row(codigo_afiliado="123", monto=100.0, nro_solben="001", ruc_proveedor="ABC", codigo_iafa="IAFA001", fch_atencion=date(2024, 1, 1), factura_id=1, id_estado=9)
     ])
 
     df_base = spark.createDataFrame([
-        Row(codigo_afiliado="123", monto=100.0, nro_solben="001", ruc_proveedor="ABC", factura_id=1),
-        Row(codigo_afiliado="123", monto=100.0, nro_solben="001", ruc_proveedor="ABC", factura_id=2)
+        Row(codigo_afiliado="123", monto=100.0, nro_solben="001", ruc_proveedor="ABC", codigo_iafa="IAFA001", fch_atencion=date(2024, 1, 1), factura_id=1),
+        Row(codigo_afiliado="123", monto=100.0, nro_solben="001", ruc_proveedor="ABC", codigo_iafa="IAFA001", fch_atencion=date(2024, 1, 1), factura_id=2)
     ])
 
-    df_facturas_filtradas = df_base.groupBy("codigo_afiliado", "monto", "nro_solben", "ruc_proveedor").agg(
+    df_facturas_filtradas = df_base.groupBy("codigo_afiliado", "monto", "nro_solben", "ruc_proveedor", "codigo_iafa", "fch_atencion").agg(
         count("factura_id").alias("count"),
         collect_list("factura_id").alias("factura_ids"),
     )
