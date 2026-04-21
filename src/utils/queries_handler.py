@@ -1,6 +1,59 @@
-#### Attention Duplicate ####
-
 from typing import List
+
+#### Invoice Duplicate ####
+
+def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
+    ids = ', '.join(map(str, invoiceIds)) 
+    query = f"""
+            (
+                SELECT 
+                fv.factura_id,
+                f.id_estado,
+                l.codigo_iafa,
+                fp.ruc_proveedor, 
+                fp.nro_factura_std as nro_factu,
+                l.codigo_afiliado,
+                l.fecha AS fch_atencion,
+                CASE
+                    WHEN LENGTH(l.numero_segunda_solicitud) = 8
+                    THEN l.numero_segunda_solicitud
+                    ELSE l.numero_de_solben
+                END AS nro_solben,
+                f.monto
+                FROM factura f
+                INNER JOIN liqtempo l ON l.factura_id = f.id
+                INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
+                INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+                WHERE fv.factura_id IN ({ids})
+            ) AS subquery
+            """
+    return query
+
+
+db_table_medden_facturas = """
+(
+    SELECT
+    f.id AS factura_id,
+    l.codigo_iafa,
+    fp.ruc_proveedor, 
+    fp.nro_factura_std as nro_factu,
+    l.codigo_afiliado,
+    l.fecha AS fch_atencion,
+    CASE
+        WHEN LENGTH(l.numero_segunda_solicitud) = 8
+        THEN l.numero_segunda_solicitud
+        ELSE l.numero_de_solben
+    END AS nro_solben,
+    f.monto
+    FROM factura f
+    INNER JOIN liqtempo l ON l.factura_id = f.id
+    INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
+    WHERE f.id_estado IN (9, 10, 13, 15, 16, 17, 18)
+    AND YEAR(f.created_at) BETWEEN YEAR(NOW()) - 1 AND YEAR(NOW())
+) AS subquery
+"""
+
+#### Attention Duplicate ####
 
 def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]) -> str:
     ids = ', '.join(map(str, invoiceIds)) 
@@ -9,14 +62,16 @@ def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]) -> str:
                 SELECT 
                 fv.factura_id,
                 f.id_estado,
+                l.codigo_iafa,
+                fp.ruc_proveedor,
                 l.codigo_afiliado,
-                f.monto,
+                l.fecha AS fch_atencion,
                 CASE
                     WHEN LENGTH(l.numero_segunda_solicitud) = 8
                     THEN l.numero_segunda_solicitud
                     ELSE l.numero_de_solben
                 END AS nro_solben,
-                fp.ruc_proveedor
+                f.monto
                 FROM factura f 
                 INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
                 INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
@@ -31,14 +86,16 @@ db_table_medden_ordenes = """
 (
     SELECT
     f.id AS factura_id,
+    l.codigo_iafa,
+    fp.ruc_proveedor,
     l.codigo_afiliado,
-    f.monto AS monto,
+    l.fecha AS fch_atencion,
     CASE
         WHEN LENGTH(l.numero_segunda_solicitud) = 8
         THEN l.numero_segunda_solicitud
         ELSE l.numero_de_solben
     END AS nro_solben,
-    fp.ruc_proveedor
+    f.monto AS monto
     FROM factura f
     INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
     INNER JOIN liqtempo l ON l.factura_id = f.id
@@ -46,39 +103,6 @@ db_table_medden_ordenes = """
     WHERE l.id_estado IN (9, 10, 13, 15, 16, 17, 18)
     AND YEAR(l.created_at) BETWEEN YEAR(NOW()) - 1 AND YEAR(NOW())
 ) AS subquery"""
-
-#### Invoice Duplicate ####
-
-def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
-    ids = ', '.join(map(str, invoiceIds)) 
-    query = f"""
-            (
-                SELECT 
-                fv.factura_id,
-                f.id_estado,
-                fp.ruc_proveedor, 
-                fp.nro_factura_std as nro_factu
-                FROM factura f
-                INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
-                INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
-                WHERE fv.factura_id IN ({ids})
-            ) AS subquery
-            """
-    return query
-
-
-db_table_medden_facturas = """
-(
-    SELECT
-    f.id AS factura_id,
-    fp.ruc_proveedor, 
-    fp.nro_factura_std as nro_factu
-    FROM factura f
-    INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
-    WHERE f.id_estado IN (9, 10, 13, 15, 16, 17, 18)
-    AND YEAR(f.created_at) BETWEEN YEAR(NOW()) - 1 AND YEAR(NOW())
-) AS subquery
-"""
 
 #### TaxType Duplicate ####
 
@@ -89,13 +113,15 @@ def db_table_validacion_taxtypes_with_ids(invoiceIds: List[int]) -> str:
                 SELECT 
                 fv.factura_id,
                 f.id_estado,
+                l.codigo_iafa,
+                fp.ruc_proveedor,
                 l.codigo_afiliado,
+                l.fecha AS fch_atencion,
                 CASE
                     WHEN LENGTH(l.numero_segunda_solicitud) = 8
                     THEN l.numero_segunda_solicitud
                     ELSE l.numero_de_solben
                 END AS nro_solben,
-                fp.ruc_proveedor,
                 l.tipo_impuesto_id as tipo_impuesto
                 FROM factura f 
                 INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
@@ -110,13 +136,15 @@ db_table_medden_impuestos = """
 (
     SELECT
     f.id AS factura_id,
+    l.codigo_iafa,
+    fp.ruc_proveedor,
     l.codigo_afiliado,
+    l.fecha AS fch_atencion,
     CASE
         WHEN LENGTH(l.numero_segunda_solicitud) = 8
         THEN l.numero_segunda_solicitud
         ELSE l.numero_de_solben
     END AS nro_solben,
-    fp.ruc_proveedor,
     l.tipo_impuesto_id as tipo_impuesto
     FROM factura f
     INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
@@ -135,9 +163,11 @@ def db_table_validacion_amount_with_ids(invoiceIds: List[int]) -> str:
                 SELECT 
                 fv.factura_id,
                 f.id_estado,
-                l.codigo_afiliado,
-                f.monto,
+                l.codigo_iafa,
                 fp.ruc_proveedor,
+                l.codigo_afiliado,
+                l.fecha AS fch_atencion,
+                f.monto,
                 l.tipo_impuesto_id as tipo_impuesto
                 FROM factura f 
                 INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
@@ -152,9 +182,11 @@ db_table_medden_montos = """
 (
     SELECT
     f.id AS factura_id,
-    l.codigo_afiliado,
-    f.monto as monto,
+    l.codigo_iafa,
     fp.ruc_proveedor,
+    l.codigo_afiliado,
+    l.fecha AS fch_atencion,
+    f.monto as monto,
     l.tipo_impuesto_id as tipo_impuesto
     FROM factura f
     INNER JOIN factura_proveedor fp ON fp.factura_id = f.id

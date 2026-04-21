@@ -7,7 +7,7 @@ from config.database import PARQUET_INVOICES_PATHS
 from pyspark.sql import SparkSession, DataFrame
 from pymysql.connections import Connection
 from utils.constants import Constants
-from pyspark.sql.types import StructType, StructField, StringType
+from pyspark.sql.types import StructType, StructField, StringType, DateType
 from utils.queries_handler import (
     db_table_medden_facturas,
     db_table_validacion_facturas_with_ids
@@ -48,12 +48,12 @@ class InvoiceDuplicateHandler:
             print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
 
             df_facturas_filtradas = df_liquidaciones.join(
-                df_facturas_por_validar.select("ruc_proveedor", "nro_factu").distinct(),
-                on=["ruc_proveedor", "nro_factu"], 
+                df_facturas_por_validar.select("codigo_iafa", "ruc_proveedor", "nro_factu", "codigo_afiliado", "fch_atencion", "nro_solben", "monto").distinct(),
+                on=["codigo_iafa", "ruc_proveedor", "nro_factu", "codigo_afiliado", "fch_atencion", "nro_solben", "monto"], 
                 how="inner"
             )
 
-            df_facturas_filtradas = df_facturas_filtradas.groupBy("ruc_proveedor", "nro_factu").agg(
+            df_facturas_filtradas = df_facturas_filtradas.groupBy("codigo_iafa", "ruc_proveedor", "nro_factu", "codigo_afiliado", "fch_atencion", "nro_solben", "monto").agg(
                 count("factura_id").alias("count"),
                 collect_list("factura_id").alias("factura_ids"),
             )
@@ -64,14 +64,24 @@ class InvoiceDuplicateHandler:
     def buscar_duplicados(self, df_facturas_filtradas: DataFrame, df_facturas_buscar: DataFrame, system: str):
         duplicados_list = df_facturas_filtradas.collect() 
         for row in duplicados_list:
+            codigo_iafa = row['codigo_iafa']
             ruc_proveedor = row['ruc_proveedor']
             nro_factu = row['nro_factu']
+            codigo_afiliado = row['codigo_afiliado']
+            fch_atencion = row['fch_atencion']
+            nro_solben = row['nro_solben']
+            monto = row['monto']
             cantidad = row['count']
             factura_ids = row['factura_ids']
             
             facturas_encontradas = df_facturas_buscar.filter(
+                (col("codigo_iafa") == codigo_iafa) &
                 (col("ruc_proveedor") == ruc_proveedor) & 
-                (col("nro_factu") == nro_factu))
+                (col("nro_factu") == nro_factu) &
+                (col("codigo_afiliado") == codigo_afiliado) & 
+                (col("fch_atencion") == fch_atencion) &
+                (col("nro_solben") == nro_solben) &
+                (col("monto") == monto))
 
             facturas_lists = facturas_encontradas.collect()
 
@@ -104,10 +114,15 @@ class InvoiceDuplicateHandler:
 
     def createDataFrameInvoice(self, df_facturas_buscar: DataFrame) -> DataFrame:
         query_results = df_facturas_buscar.collect()
-        data = [(row['ruc_proveedor'], row['nro_factu'], row['factura_id']) for row in query_results]
+        data = [(row['codigo_iafa'], row['ruc_proveedor'], row['nro_factu'], row['codigo_afiliado'], row['fch_atencion'], row['nro_solben'], row['monto'], row['factura_id']) for row in query_results]
         schema = StructType([
+            StructField("codigo_iafa", StringType(), True),
             StructField("ruc_proveedor", StringType(), True),
             StructField("nro_factu", StringType(), True),
+            StructField("codigo_afiliado", StringType(), True),
+            StructField("fch_atencion", DateType(), True),
+            StructField("nro_solben", StringType(), True),
+            StructField("monto", StringType(), True),
             StructField("factura_id", StringType(), True)
         ])
         return self.spark.createDataFrame(data, schema)

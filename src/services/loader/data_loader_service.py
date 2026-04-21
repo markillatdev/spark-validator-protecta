@@ -67,26 +67,33 @@ class DataFrameLoader:
 
         if origen == Constants.SYSTEM_SOLBEN_SEMEFA:
 
-            db_table_liquidacion_ordenes = f"""
+            db_table_liquidacion_facturas = f"""
             (
                 SELECT
                 silux_factura_id AS factura_id,
+                cliente as codigo_iafa,
+                ruc as ruc_proveedor,
+                nro_factu,
                 CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
-                tot_clini AS monto,
+                fch_atencion,
                 nro_soli AS nro_solben,
-                ruc AS ruc_proveedor
+                tot_clini AS monto
                 FROM liquidacion 
                 WHERE YEAR(proceso) IN ({years_str})
                 AND frecuencia = 0
             ) AS subquery
             """
 
-            db_table_liquidacion_facturas = f"""
+            db_table_liquidacion_ordenes = f"""
             (
                 SELECT
                 silux_factura_id AS factura_id,
-                ruc as ruc_proveedor,
-                nro_factu
+                cliente AS codigo_iafa,
+                ruc AS ruc_proveedor,
+                CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
+                fch_atencion,
+                nro_soli AS nro_solben,
+                tot_clini AS monto
                 FROM liquidacion 
                 WHERE YEAR(proceso) IN ({years_str})
                 AND frecuencia = 0
@@ -97,9 +104,11 @@ class DataFrameLoader:
             (
                 SELECT
                 silux_factura_id AS factura_id,
-                CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
-                nro_soli AS nro_solben,
+                cliente AS codigo_iafa,
                 ruc AS ruc_proveedor,
+                CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
+                fch_atencion,
+                nro_soli AS nro_solben,
                 tipo_impuesto
                 FROM liquidacion 
                 WHERE YEAR(proceso) IN ({years_str})
@@ -111,9 +120,11 @@ class DataFrameLoader:
             (
                 SELECT
                 silux_factura_id AS factura_id,
-                CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
-                tot_clini AS monto,
+                cliente AS codigo_iafa,
                 ruc AS ruc_proveedor,
+                CONCAT(cliente, '-' , cod_titula, '-' , categoria) AS codigo_afiliado,
+                fch_atencion,
+                tot_clini AS monto,
                 tipo_impuesto
                 FROM liquidacion 
                 WHERE YEAR(proceso) IN ({years_str})
@@ -125,34 +136,46 @@ class DataFrameLoader:
         
         elif origen == Constants.SYSTEM_SILUX_SEMEFA:
 
-            db_table_liquidacion_ordenes = f"""
+            db_table_liquidacion_facturas = f"""
             (
-                SELECT 
+                SELECT
                 f.id AS factura_id,
+                l.codigo_iafa,
+                fp.ruc_proveedor, 
+                fp.nro_factura_std as nro_factu,
                 l.codigo_afiliado,
-                f.monto,
+                l.fecha AS fch_atencion,
                 CASE
                     WHEN LENGTH(l.numero_segunda_solicitud) = 8
                     THEN l.numero_segunda_solicitud
                     ELSE l.numero_de_solben
                 END AS nro_solben,
-                fp.ruc_proveedor
+                f.monto
                 FROM factura f
                 INNER JOIN liqtempo l ON l.factura_id = f.id
-                INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
                 INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
                 WHERE f.id_estado IN (16, 17)
                 AND YEAR(f.fecha_envio_iafa) IN ({years_str})
             ) AS subquery
             """
 
-            db_table_liquidacion_facturas = f"""
+            db_table_liquidacion_ordenes = f"""
             (
-                SELECT
+                SELECT 
                 f.id AS factura_id,
+                l.codigo_iafa,
                 fp.ruc_proveedor,
-                fp.nro_factura_std as nro_factu
-                FROM factura f 
+                l.codigo_afiliado,
+                l.fecha AS fch_atencion,
+                CASE
+                WHEN LENGTH(l.numero_segunda_solicitud) = 8
+                    THEN l.numero_segunda_solicitud
+                    ELSE l.numero_de_solben
+                END AS nro_solben,
+                f.monto AS monto
+                FROM factura f
+                INNER JOIN liqtempo l ON l.factura_id = f.id
+                INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
                 INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
                 WHERE f.id_estado IN (16, 17)
                 AND YEAR(f.fecha_envio_iafa) IN ({years_str})
@@ -163,14 +186,16 @@ class DataFrameLoader:
             (
                 SELECT
                 f.id AS factura_id,
+                l.codigo_iafa,
+                fp.ruc_proveedor,
                 l.codigo_afiliado,
+                l.fecha AS fch_atencion,
                 CASE
                     WHEN LENGTH(l.numero_segunda_solicitud) = 8
                     THEN l.numero_segunda_solicitud
                     ELSE l.numero_de_solben
                 END AS nro_solben,
-                fp.ruc_proveedor,
-                l.tipo_impuesto_id as tipo_impuesto 
+                l.tipo_impuesto_id as tipo_impuesto
                 FROM factura f
                 INNER JOIN liqtempo l ON l.factura_id = f.id
                 INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
@@ -184,10 +209,12 @@ class DataFrameLoader:
             (
                 SELECT
                 f.id AS factura_id,
-                l.codigo_afiliado,
-                f.monto,
+                l.codigo_iafa,
                 fp.ruc_proveedor,
-                l.tipo_impuesto_id as tipo_impuesto 
+                l.codigo_afiliado,
+                l.fecha AS fch_atencion,
+                f.monto as monto,
+                l.tipo_impuesto_id as tipo_impuesto
                 FROM factura f
                 INNER JOIN liqtempo l ON l.factura_id = f.id
                 INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
