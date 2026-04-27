@@ -1,11 +1,8 @@
-from pyspark.sql import SparkSession
+from config.spark_config import get_spark_session
 import os
 
-# Crear la sesión de Spark
-spark = SparkSession.builder \
-    .appName("Validacion Facturas") \
-    .config("spark.jars", "/home/markillat/Documentos/mysqls/mysql-connector-java-8.0.29.jar") \
-    .getOrCreate()
+# Obtener la sesión de Spark singleton
+spark = get_spark_session()
 
 df_solben_sabsa = spark.read.parquet(f'{os.getenv("STORAGE_PATH")}/attentions/solben_protecta/solben_sabsa_attentions_2024.parquet')
 
@@ -32,6 +29,3 @@ duplicados.show(truncate=False)
 
 # Guardar los duplicados en un archivo CSV, sobrescribiendo si ya existe
 duplicados.write.mode('overwrite').csv(f'{os.getenv("STORAGE_PATH")}/duplicados.csv', header=True)
-
-# Detener la sesión de Spark
-spark.stop()

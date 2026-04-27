@@ -1,8 +1,11 @@
-pyspark 
-pymysql 
-python-dotenv 
-fastapi 
-uvicorn 
-pydantic 
+pyspark==3.5.3
+pymysql
+python-dotenv
+fastapi
+uvicorn
+pydantic
 python-jose
 pytest
+celery[redis]>=5.3.0
+redis>=5.0.0
+setuptools

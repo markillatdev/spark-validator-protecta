@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Instalar dependencias necesarias
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    software-properties-common openjdk-11-jdk wget tar python3 python3-pip procps iputils-ping supervisor&& \
+    software-properties-common openjdk-11-jdk wget tar python3 python3-pip procps iputils-ping supervisor redis-server&& \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -63,10 +63,13 @@ COPY . /src
 ENV STORAGE_PATH=/src/repositories
 
 # Exponer los puertos necesarios
-EXPOSE 8080 8000
+EXPOSE 8080 8000 6379
 
 #Configuracion de supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Asegurar que Redis inicie correctamente
+RUN mkdir -p /var/run/redis && chown redis:redis /var/run/redis
 
 #Ejecucion de supervisor varios procesos
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

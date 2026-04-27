@@ -3,19 +3,22 @@ from fastapi.responses import JSONResponse
 from utils.constants import Constants
 
 class SystemMiddleware:
-
-
+ 
     def __init__(self):
         self.allowed_systems = [
             Constants.SYSTEM_SILUX_PROTECTA
         ]
         self.swagger_paths = ["/docs", "/openapi.json", "/redoc"]
+        self.exempt_paths = ["/api/task-status/"]
 
 
     async def __call__(self, request: Request, call_next):
         try:
 
             if any(request.url.path.startswith(path) for path in self.swagger_paths):
+                return await call_next(request)
+            
+            if any(request.url.path.startswith(path) for path in self.exempt_paths):
                 return await call_next(request)
     
             system = request.headers.get("system")

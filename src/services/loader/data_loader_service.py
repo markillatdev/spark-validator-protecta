@@ -1,5 +1,5 @@
 from typing import List
-from config.spark_config import create_spark_session
+from config.spark_config import get_spark_session
 from schemas.schema import responseBasicSchema
 from utils.parquet_handler import load_or_create_parquet
 from utils.constants import Constants
@@ -24,7 +24,7 @@ class DataFrameLoader:
             if not os.path.exists(os.getenv("STORAGE_PATH") + "/" + directory):
                 os.makedirs(os.getenv("STORAGE_PATH") + "/" + directory)
             filename = f"{directory}/solben_{resource_type}_{year}.parquet"
-            spark = create_spark_session()
+            spark = get_spark_session()
             if spark is None:
                 raise Exception("No se pudo crear la sesión de Spark")
             load_or_create_parquet(spark, db_table, filename, origen)

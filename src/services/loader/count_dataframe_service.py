@@ -1,11 +1,11 @@
 from config.database import PARQUET_INVOICES_PATHS
-from config.spark_config import create_spark_session
+from config.spark_config import get_spark_session
 from schemas.schema import responseBasicSchema
 
 class CountDataframe:
 
     def __init__(self):
-        self.spark = create_spark_session()
+        self.spark = get_spark_session()
 
     def count_merged_records(self, repository: str) -> responseBasicSchema:
         path = PARQUET_INVOICES_PATHS.get(repository)

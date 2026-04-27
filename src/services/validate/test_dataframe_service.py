@@ -1,5 +1,5 @@
 from typing import List
-from config.spark_config import create_spark_session
+from config.spark_config import get_spark_session
 from pyspark.sql.functions import col # type: ignore
 from pyspark.sql import DataFrame, SparkSession
 from config.database import PARQUET_INVOICES_PATHS
@@ -12,7 +12,7 @@ class testDataframeService:
         self.coreSystem = coreSystem
 
     def res(self):
-        spark = create_spark_session()
+        spark = get_spark_session()
 
         df_facturas_por_validar = self.simulation_facturas_por_validar(spark)
         df_facturas_buscar = self.simulation_facturas_por_validar_with_ids(spark)

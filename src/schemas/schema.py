@@ -110,3 +110,37 @@ class GetRecordsSchema(BaseModel):
             }
         }
     )
+
+
+class TaskResponseSchema(BaseModel):
+    task_id: str
+    status: str
+    msg: str
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "ejemplo": {
+                "task_id": "abc123-def456-ghi789",
+                "status": "PENDING",
+                "msg": "Tarea enviada a la cola"
+            }
+        }
+    )
+
+
+class TaskStatusSchema(BaseModel):
+    task_id: str
+    status: str
+    result: dict | None = None
+    error: str | None = None
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "ejemplo": {
+                "task_id": "abc123-def456-ghi789",
+                "status": "SUCCESS",
+                "result": {"msg": "Operación completada", "success": True, "total": 10},
+                "error": None
+            }
+        }
+    )
