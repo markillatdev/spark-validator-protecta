@@ -20,8 +20,8 @@ class InvoiceUpdate:
         try:
             cursor.execute(update_factura, (
                 message, 2, 3,
-                1 if system == Constants.SYSTEM_SILUX_SEMEFA else 0,
-                1 if system == Constants.SYSTEM_SOLBEN_SEMEFA else 0,
+                1 if system == Constants.SYSTEM_SILUX_PROTECTA else 0,
+                1 if system == Constants.SYSTEM_SOLBEN_PROTECTA else 0,
                 factura_id
             ))
             if factura_ids:

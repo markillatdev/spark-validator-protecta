@@ -15,7 +15,7 @@ class SystemService:
 
     def operations_attention(self, invoiceIds: List[int]):
         try:
-            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+            if self.system == Constants.SYSTEM_SILUX_PROTECTA:
                 sabsa = SemefaCore(self.system)
                 sabsa.execute_attentions(invoiceIds)
             else:
@@ -39,7 +39,7 @@ class SystemService:
         
     def operations_invoices(self, invoiceIds: List[int]):
         try:
-            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+            if self.system == Constants.SYSTEM_SILUX_PROTECTA:
                 sabsa = SemefaCore(self.system)
                 sabsa.execute_invoices(invoiceIds)
             else:
@@ -63,7 +63,7 @@ class SystemService:
 
     def operations_taxtypes(self, invoiceIds: List[int]):
         try:
-            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+            if self.system == Constants.SYSTEM_SILUX_PROTECTA:
                 sabsa = SemefaCore(self.system)
                 sabsa.execute_taxtypes(invoiceIds)
             else:
@@ -87,7 +87,7 @@ class SystemService:
 
     def operations_amounts(self, invoiceIds: List[int]):
         try:
-            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+            if self.system == Constants.SYSTEM_SILUX_PROTECTA:
                 sabsa = SemefaCore(self.system)
                 sabsa.execute_amounts(invoiceIds)
             else:
@@ -111,7 +111,7 @@ class SystemService:
         
     def operations_update_invoices(self, invoiceIds: List[int]):
         try:
-            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+            if self.system == Constants.SYSTEM_SILUX_PROTECTA:
                 sabsa = SemefaCore(self.system)
                 sabsa.execute_update_invoices(invoiceIds)
             else:
@@ -135,7 +135,7 @@ class SystemService:
         
     def operations_update_reset_invoices(self, invoiceIds: List[int]):
         try:
-            if self.system == Constants.SYSTEM_SILUX_SEMEFA:
+            if self.system == Constants.SYSTEM_SILUX_PROTECTA:
                 sabsa = SemefaCore(self.system)
                 sabsa.execute_reset_invoices(invoiceIds)
             else:

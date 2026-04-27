@@ -7,7 +7,7 @@ class SystemMiddleware:
 
     def __init__(self):
         self.allowed_systems = [
-            Constants.SYSTEM_SILUX_SEMEFA
+            Constants.SYSTEM_SILUX_PROTECTA
         ]
         self.swagger_paths = ["/docs", "/openapi.json", "/redoc"]
 

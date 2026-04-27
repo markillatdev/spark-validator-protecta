@@ -15,7 +15,7 @@ class TestDatabaseConnection:
     @patch('config.db_connection.pymysql.connect')
     def test_create_db_connection_success(self, mock_connect):
         mock_connect.return_value = MagicMock()
-        result = create_db_connection(Constants.SYSTEM_SILUX_SEMEFA)
+        result = create_db_connection(Constants.SYSTEM_SILUX_PROTECTA)
         mock_connect.assert_called_once()
         assert result is not None
 
@@ -31,7 +31,7 @@ class TestReadTableFromDB:
         mock_df = MagicMock()
         mock_read.return_value = mock_df
         from config.db_connection import read_table_from_db as db_read
-        result = db_read(spark, "test_table", Constants.SYSTEM_SILUX_SEMEFA)
+        result = db_read(spark, "test_table", Constants.SYSTEM_SILUX_PROTECTA)
         assert result is not None
 
     @patch('config.database.DATABASE_CONFIG', {})
@@ -53,4 +53,4 @@ class TestParquetHandler:
         mock_spark = MagicMock()
         with patch('utils.parquet_handler.os.getenv', return_value=None):
             with pytest.raises(ValueError, match="STORAGE_PATH environment variable is not set"):
-                load_or_create_parquet(mock_spark, "test_query", "test.parquet", Constants.SYSTEM_SILUX_SEMEFA)
+                load_or_create_parquet(mock_spark, "test_query", "test.parquet", Constants.SYSTEM_SILUX_PROTECTA)

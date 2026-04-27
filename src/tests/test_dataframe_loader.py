@@ -12,7 +12,7 @@ def spark():
 
 @pytest.fixture
 def loader():
-    return DataFrameLoader(Constants.SYSTEM_SILUX_SEMEFA)
+    return DataFrameLoader(Constants.SYSTEM_SILUX_PROTECTA)
 
 
 class TestDataFrameLoader:
@@ -30,7 +30,7 @@ class TestDataFrameLoader:
              patch.object(loader, 'querys') as mock_querys:
             
             mock_querys.return_value = ("query1", "query2", "query3", "query4")
-            result = loader.load_data([2019], Constants.SYSTEM_SILUX_SEMEFA)
+            result = loader.load_data([2019], Constants.SYSTEM_SILUX_PROTECTA)
             
             assert result["success"] is True
             assert result["msg"] == "Datos cargados exitosamente"
@@ -40,7 +40,7 @@ class TestDataFrameLoader:
             mock_amount.assert_called_once()
 
     def test_load_data_valid_system_solben(self, loader):
-        loader.system = Constants.SYSTEM_SOLBEN_SEMEFA
+        loader.system = Constants.SYSTEM_SOLBEN_PROTECTA
         with patch.object(loader, 'load_attention') as mock_attention, \
              patch.object(loader, 'load_invoices') as mock_invoices, \
              patch.object(loader, 'load_tax_type') as mock_tax_type, \
@@ -48,7 +48,7 @@ class TestDataFrameLoader:
              patch.object(loader, 'querys') as mock_querys:
             
             mock_querys.return_value = ("query1", "query2", "query3", "query4")
-            result = loader.load_data([2019], Constants.SYSTEM_SOLBEN_SEMEFA)
+            result = loader.load_data([2019], Constants.SYSTEM_SOLBEN_PROTECTA)
             
             assert result["success"] is True
             mock_attention.assert_called_once()
@@ -56,13 +56,13 @@ class TestDataFrameLoader:
     def test_load_data_querys_return_empty(self, loader):
         with patch.object(loader, 'querys') as mock_querys:
             mock_querys.return_value = (None, None, None, None)
-            result = loader.load_data([2019], Constants.SYSTEM_SILUX_SEMEFA)
+            result = loader.load_data([2019], Constants.SYSTEM_SILUX_PROTECTA)
             
             assert result["success"] is False
             assert "No se pudo realizar la carga" in result["msg"]
 
     def test_querys_silux_returns_correct_structure(self, loader):
-        result = loader.querys("2019, 2020", Constants.SYSTEM_SILUX_SEMEFA)
+        result = loader.querys("2019, 2020", Constants.SYSTEM_SILUX_PROTECTA)
         
         assert len(result) == 4
         ordenes, facturas, tipo_impuesto, importe = result
@@ -70,8 +70,8 @@ class TestDataFrameLoader:
         assert "factura_proveedor fp" in facturas.lower()
 
     def test_querys_solben_returns_correct_structure(self, loader):
-        loader.system = Constants.SYSTEM_SOLBEN_SEMEFA
-        result = loader.querys("2019, 2020", Constants.SYSTEM_SOLBEN_SEMEFA)
+        loader.system = Constants.SYSTEM_SOLBEN_PROTECTA
+        result = loader.querys("2019, 2020", Constants.SYSTEM_SOLBEN_PROTECTA)
         
         assert len(result) == 4
         ordenes, facturas, tipo_impuesto, importe = result
@@ -86,14 +86,14 @@ class TestDataFrameLoader:
     @patch('services.loader.data_loader_service.shutil.rmtree')
     def test_destroy_dataframe_success(self, mock_rmtree, mock_exists, loader):
         mock_exists.return_value = True
-        result = loader.destroy_dataframe(Constants.SYSTEM_SILUX_SEMEFA)
+        result = loader.destroy_dataframe(Constants.SYSTEM_SILUX_PROTECTA)
         assert result["success"] is True
         assert "eliminados exitosamente" in result["msg"]
 
     @patch('services.loader.data_loader_service.os.path.exists')
     def test_destroy_dataframe_directory_not_exists(self, mock_exists, loader):
         mock_exists.return_value = False
-        result = loader.destroy_dataframe(Constants.SYSTEM_SILUX_SEMEFA)
+        result = loader.destroy_dataframe(Constants.SYSTEM_SILUX_PROTECTA)
         assert result["success"] is False
         assert "No existe el directorio" in result["msg"]
 
@@ -101,13 +101,13 @@ class TestDataFrameLoader:
 class TestDataFrameSchemaValidation:
     def test_dataframe_schema_valid(self):
         from schemas.schema import DataFrameSchema
-        schema = DataFrameSchema(years=[2019, 2020], origen=Constants.SYSTEM_SILUX_SEMEFA)
+        schema = DataFrameSchema(years=[2019, 2020], origen=Constants.SYSTEM_SILUX_PROTECTA)
         assert schema.years == [2019, 2020]
-        assert schema.origen == Constants.SYSTEM_SILUX_SEMEFA
+        assert schema.origen == Constants.SYSTEM_SILUX_PROTECTA
 
     def test_dataframe_schema_empty_years(self):
         from schemas.schema import DataFrameSchema
-        schema = DataFrameSchema(years=[], origen=Constants.SYSTEM_SOLBEN_SEMEFA)
+        schema = DataFrameSchema(years=[], origen=Constants.SYSTEM_SOLBEN_PROTECTA)
         assert schema.years == []
 
     def test_dataframe_schema_invalid_origen(self):
@@ -125,7 +125,7 @@ class TestLoadResources:
             
             mock_exists.return_value = False
             mock_spark.return_value = MagicMock()
-            loader.load_resources(2019, "test_query", "attentions", Constants.SYSTEM_SILUX_SEMEFA)
+            loader.load_resources(2019, "test_query", "attentions", Constants.SYSTEM_SILUX_PROTECTA)
             
             mock_makedirs.assert_called_once()
             mock_load.assert_called_once()
@@ -135,11 +135,11 @@ class TestDebug500Error:
     @patch('services.loader.data_loader_service.create_spark_session')
     @patch('services.loader.data_loader_service.load_or_create_parquet')
     def test_load_data_with_real_query_failure(self, mock_load_parquet, mock_spark):
-        loader = DataFrameLoader(Constants.SYSTEM_SOLBEN_SEMEFA)
+        loader = DataFrameLoader(Constants.SYSTEM_SOLBEN_PROTECTA)
         mock_spark.return_value = MagicMock()
         mock_load_parquet.side_effect = Exception("JDBC Connection failed: Connection refused")
         
-        result = loader.load_data([2019], Constants.SYSTEM_SOLBEN_SEMEFA)
+        result = loader.load_data([2019], Constants.SYSTEM_SOLBEN_PROTECTA)
         
         assert result["success"] is False
         assert "Error al cargar datos" in result["msg"]

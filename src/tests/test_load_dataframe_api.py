@@ -24,7 +24,7 @@ class TestLoadDataFrameToDatabase:
         response = client.post(
             "/api/load-dataframe-to-database",
             json={"years": [2019], "origen": "invalid_system"},
-            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_SEMEFA}
+            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_PROTECTA}
         )
         assert response.status_code == 200
         data = response.json()
@@ -44,8 +44,8 @@ class TestLoadDataFrameToDatabase:
         
         response = client.post(
             "/api/load-dataframe-to-database",
-            json={"years": [2019], "origen": Constants.SYSTEM_SILUX_SEMEFA},
-            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_SEMEFA}
+            json={"years": [2019], "origen": Constants.SYSTEM_SILUX_PROTECTA},
+            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_PROTECTA}
         )
         
         assert response.status_code == 200
@@ -61,7 +61,7 @@ class TestLoadDataFrameToDatabase:
         response = client.post(
             "/api/load-dataframe-to-database",
             json={"years": [2019], "origen": "invalid_system"},
-            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_SEMEFA}
+            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_PROTECTA}
         )
         
         assert response.status_code == 200
@@ -71,7 +71,7 @@ class TestLoadDataFrameToDatabase:
     def test_load_dataframe_without_token(self):
         response = client.post(
             "/api/load-dataframe-to-database",
-            json={"years": [2019], "origen": Constants.SYSTEM_SILUX_SEMEFA}
+            json={"years": [2019], "origen": Constants.SYSTEM_SILUX_PROTECTA}
         )
         assert response.status_code == 401
 
@@ -79,8 +79,8 @@ class TestLoadDataFrameToDatabase:
         token = get_test_token()
         response = client.post(
             "/api/load-dataframe-to-database",
-            json={"years": "2019", "origen": Constants.SYSTEM_SILUX_SEMEFA},
-            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_SEMEFA}
+            json={"years": "2019", "origen": Constants.SYSTEM_SILUX_PROTECTA},
+            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_PROTECTA}
         )
         assert response.status_code == 422
 
@@ -89,6 +89,6 @@ class TestLoadDataFrameToDatabase:
         response = client.post(
             "/api/load-dataframe-to-database",
             json={"years": [2019]},
-            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_SEMEFA}
+            headers={"Authorization": f"Bearer {token}", "system": Constants.SYSTEM_SILUX_PROTECTA}
         )
         assert response.status_code == 422

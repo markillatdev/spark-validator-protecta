@@ -16,7 +16,7 @@ def spark():
 def handler(spark):
     # Mock de la conexión a la base de datos
     mock_connection = MagicMock()
-    return AttentionDuplicateHandler(spark, mock_connection, Constants.SYSTEM_SILUX_SEMEFA)
+    return AttentionDuplicateHandler(spark, mock_connection, Constants.SYSTEM_SILUX_PROTECTA)
 
 def test_buscar_duplicados(spark: SparkSession, handler: AttentionDuplicateHandler):
     from datetime import date
@@ -36,14 +36,14 @@ def test_buscar_duplicados(spark: SparkSession, handler: AttentionDuplicateHandl
 
     handler.invoice_updater.update_invoices_detected = MagicMock()
 
-    handler.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, Constants.SYSTEM_SILUX_SEMEFA)
+    handler.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, Constants.SYSTEM_SILUX_PROTECTA)
 
     handler.invoice_updater.update_invoices_detected.assert_called_once_with(
-        "Atencion duplicada: La Atencion 001 se encuentra duplicado en: silux_semefa, monto: 100.0, codigo afiliado: 123, clinica: ABC", 1, Constants.SYSTEM_SILUX_SEMEFA, [2]
+        "Atencion duplicada: La Atencion 001 se encuentra duplicado en: silux_semefa, monto: 100.0, codigo afiliado: 123, clinica: ABC", 1, Constants.SYSTEM_SILUX_PROTECTA, [2]
     )
 
 def systems() -> list:
     return [
-        {"name": Constants.SYSTEM_SILUX_SEMEFA},
-        {"name": Constants.SYSTEM_SOLBEN_SEMEFA, "load_dataframes": True}
+        {"name": Constants.SYSTEM_SILUX_PROTECTA},
+        {"name": Constants.SYSTEM_SOLBEN_PROTECTA, "load_dataframes": True}
     ]

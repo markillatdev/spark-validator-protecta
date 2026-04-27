@@ -9,9 +9,9 @@ class SemefaCore(BaseMain):
 
     def systems(self) -> list:
         return [
-            {"name": Constants.SYSTEM_SILUX_SEMEFA},
-            {"name": Constants.SYSTEM_SILUX_SEMEFA, "load_dataframes": True},
-            {"name": Constants.SYSTEM_SOLBEN_SEMEFA, "load_dataframes": True},
+            {"name": Constants.SYSTEM_SILUX_PROTECTA},
+            {"name": Constants.SYSTEM_SILUX_PROTECTA, "load_dataframes": True},
+            {"name": Constants.SYSTEM_SOLBEN_PROTECTA, "load_dataframes": True},
         ]
     
     def execute_attentions(self, invoiceIds: List[int]):

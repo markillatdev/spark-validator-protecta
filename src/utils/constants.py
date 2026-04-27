@@ -1,6 +1,6 @@
 class Constants:
-    SYSTEM_SILUX_SEMEFA = "silux_semefa"
-    SYSTEM_SOLBEN_SEMEFA = "solben_semefa"
+    SYSTEM_SILUX_PROTECTA = "silux_protecta"
+    SYSTEM_SOLBEN_PROTECTA = "solben_protecta"
 
     # Estados
     ESTADO_APROBADO_MA = 9

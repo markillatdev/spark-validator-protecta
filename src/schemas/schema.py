@@ -84,7 +84,7 @@ class DataFrameSchema(BaseModel):
         json_schema_extra={
             "ejemplo": {
                 "years": [2019, 2020],
-                "origen": [Constants.SYSTEM_SILUX_SEMEFA, Constants.SYSTEM_SOLBEN_SEMEFA]
+                "origen": [Constants.SYSTEM_SILUX_PROTECTA, Constants.SYSTEM_SOLBEN_PROTECTA]
             }
         }
     )
@@ -95,7 +95,7 @@ class DestroyDataFrameSchema(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             "ejemplo": {
-                "origen": [Constants.SYSTEM_SILUX_SEMEFA, Constants.SYSTEM_SOLBEN_SEMEFA]
+                "origen": [Constants.SYSTEM_SILUX_PROTECTA, Constants.SYSTEM_SOLBEN_PROTECTA]
             }
         }
     )
