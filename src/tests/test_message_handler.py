@@ -22,7 +22,7 @@ class TestMessageHandler:
             nro_solben="SOL001",
             monto=100.50
         )
-        system = "silux_semefa"
+        system = "silux_protecta"
 
         result = MessageHandler.message_case_1(message, value, system)
 
@@ -34,7 +34,7 @@ class TestMessageHandler:
         assert "2024-01-15" in result
         assert "SOL001" in result
         assert "100.5" in result
-        assert "silux_semefa" in result
+        assert "silux_protecta" in result
 
     def test_message_case_2_with_duplicate(self):
         message = "Duplicado encontrado"
@@ -46,7 +46,7 @@ class TestMessageHandler:
             nro_solben="SOL002",
             monto=200.75
         )
-        system = "solben_semefa"
+        system = "solben_protecta"
 
         result = MessageHandler.message_case_2(message, value, system)
 
@@ -54,7 +54,7 @@ class TestMessageHandler:
         assert "IAFA002" in result
         assert "Afiliado456" in result
         assert "200.75" in result
-        assert "solben_semefa" in result
+        assert "solben_protecta" in result
 
     def test_message_case_3_with_duplicate(self):
         message = "Duplicado encontrado"
@@ -66,7 +66,7 @@ class TestMessageHandler:
             nro_solben="SOL003",
             tipo_impuesto="IGV"
         )
-        system = "silux_semefa"
+        system = "silux_protecta"
 
         result = MessageHandler.message_case_3(message, value, system)
 
@@ -83,7 +83,7 @@ class TestMessageHandler:
             monto=300.00,
             tipo_impuesto="ISC"
         )
-        system = "solben_semefa"
+        system = "solben_protecta"
 
         result = MessageHandler.message_case_4(message, value, system)
 
@@ -102,7 +102,7 @@ class TestMessageHandler:
             nro_solben="SOL001",
             monto=100.50
         )
-        system = "silux_semefa"
+        system = "silux_protecta"
 
         try:
             result = MessageHandler.message_case_1(message, value, system)
@@ -121,7 +121,7 @@ class TestMessageHandler:
             nro_solben="SOL002",
             monto=200.75
         )
-        system = "solben_semefa"
+        system = "solben_protecta"
 
         try:
             result = MessageHandler.message_case_2(message, value, system)

@@ -24,7 +24,7 @@ def test_show_parquet_schema_and_sample(spark):
             print(f"\n=== {subdir.upper()} - Directorio no encontrado: {subdir_path} ===")
             continue
 
-        systems = ["solben_semefa", "silux_semefa"]
+        systems = ["solben_protecta", "silux_protecta"]
         for system in systems:
             system_path = os.path.join(subdir_path, system)
             if not os.path.exists(system_path):

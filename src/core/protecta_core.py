@@ -2,7 +2,7 @@ from typing import List
 from core.base_main import BaseMain
 from utils.constants import Constants
 
-class SemefaCore(BaseMain):
+class ProtectaCore(BaseMain):
     
     def __init__(self, name: str):
         super().__init__(name)

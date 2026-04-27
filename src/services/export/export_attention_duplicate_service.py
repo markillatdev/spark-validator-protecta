@@ -7,10 +7,10 @@ spark = SparkSession.builder \
     .config("spark.jars", "/home/markillat/Documentos/mysqls/mysql-connector-java-8.0.29.jar") \
     .getOrCreate()
 
-df_solben_sabsa = spark.read.parquet(f'{os.getenv("STORAGE_PATH")}/attentions/solben_semefa/solben_sabsa_attentions_2024.parquet')
+df_solben_sabsa = spark.read.parquet(f'{os.getenv("STORAGE_PATH")}/attentions/solben_protecta/solben_sabsa_attentions_2024.parquet')
 
 # Cargar archivo Parquet y Unir los DataFrames
-df_antiguas = spark.read.parquet(f'{os.getenv("STORAGE_PATH")}/attentions/solben_semefa/*.parquet')
+df_antiguas = spark.read.parquet(f'{os.getenv("STORAGE_PATH")}/attentions/solben_protecta/*.parquet')
 
 # Unir los DataFrames
 df_facturas_completas = df_antiguas.union(df_solben_sabsa)

@@ -39,7 +39,7 @@ def test_buscar_duplicados(spark: SparkSession, handler: AttentionDuplicateHandl
     handler.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, Constants.SYSTEM_SILUX_PROTECTA)
 
     handler.invoice_updater.update_invoices_detected.assert_called_once_with(
-        "Atencion duplicada: La Atencion 001 se encuentra duplicado en: silux_semefa, monto: 100.0, codigo afiliado: 123, clinica: ABC", 1, Constants.SYSTEM_SILUX_PROTECTA, [2]
+        "Atencion duplicada: La Atencion 001 se encuentra duplicado en: silux_protecta, monto: 100.0, codigo afiliado: 123, clinica: ABC", 1, Constants.SYSTEM_SILUX_PROTECTA, [2]
     )
 
 def systems() -> list:

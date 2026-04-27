@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import HTTPException, status
-from core.semefa_core import SemefaCore
+from core.protecta_core import ProtectaCore
 from utils.constants import Constants
 import logging
 
@@ -16,7 +16,7 @@ class SystemService:
     def operations_attention(self, invoiceIds: List[int]):
         try:
             if self.system == Constants.SYSTEM_SILUX_PROTECTA:
-                sabsa = SemefaCore(self.system)
+                sabsa = ProtectaCore(self.system)
                 sabsa.execute_attentions(invoiceIds)
             else:
                 raise HTTPException(
@@ -40,7 +40,7 @@ class SystemService:
     def operations_invoices(self, invoiceIds: List[int]):
         try:
             if self.system == Constants.SYSTEM_SILUX_PROTECTA:
-                sabsa = SemefaCore(self.system)
+                sabsa = ProtectaCore(self.system)
                 sabsa.execute_invoices(invoiceIds)
             else:
                 raise HTTPException(
@@ -64,7 +64,7 @@ class SystemService:
     def operations_taxtypes(self, invoiceIds: List[int]):
         try:
             if self.system == Constants.SYSTEM_SILUX_PROTECTA:
-                sabsa = SemefaCore(self.system)
+                sabsa = ProtectaCore(self.system)
                 sabsa.execute_taxtypes(invoiceIds)
             else:
                 raise HTTPException(
@@ -88,7 +88,7 @@ class SystemService:
     def operations_amounts(self, invoiceIds: List[int]):
         try:
             if self.system == Constants.SYSTEM_SILUX_PROTECTA:
-                sabsa = SemefaCore(self.system)
+                sabsa = ProtectaCore(self.system)
                 sabsa.execute_amounts(invoiceIds)
             else:
                 raise HTTPException(
@@ -112,7 +112,7 @@ class SystemService:
     def operations_update_invoices(self, invoiceIds: List[int]):
         try:
             if self.system == Constants.SYSTEM_SILUX_PROTECTA:
-                sabsa = SemefaCore(self.system)
+                sabsa = ProtectaCore(self.system)
                 sabsa.execute_update_invoices(invoiceIds)
             else:
                 raise HTTPException(
@@ -136,7 +136,7 @@ class SystemService:
     def operations_update_reset_invoices(self, invoiceIds: List[int]):
         try:
             if self.system == Constants.SYSTEM_SILUX_PROTECTA:
-                sabsa = SemefaCore(self.system)
+                sabsa = ProtectaCore(self.system)
                 sabsa.execute_reset_invoices(invoiceIds)
             else:
                 raise HTTPException(

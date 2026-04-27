@@ -106,7 +106,7 @@ class GetRecordsSchema(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             "ejemplo": {
-                "repository": ["silux_semefa", "solben_semefa"],
+                "repository": ["silux_protecta", "solben_protecta"],
             }
         }
     )
