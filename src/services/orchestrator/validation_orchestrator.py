@@ -1,11 +1,11 @@
 from typing import List, Dict
 from pyspark.sql import SparkSession
 from pymysql.connections import Connection
-from services.validate.invoice_duplicate_service import InvoiceDuplicateHandler
-from services.validate.attention_duplicate_service import AttentionDuplicateHandler
-from services.validate.taxtype_duplicate_service import TaxTypeDuplicateHandler
-from services.validate.amount_duplicate_service import AmountDuplicateHandler
-from services.validate.update_service import InvoiceUpdate
+from services.validator.invoice_duplicate_service import InvoiceDuplicateHandler
+from services.validator.attention_duplicate_service import AttentionDuplicateHandler
+from services.validator.taxtype_duplicate_service import TaxTypeDuplicateHandler
+from services.validator.amount_duplicate_service import AmountDuplicateHandler
+from services.validator.update_service import InvoiceUpdate
 from config.database import PARQUET_PATHS
 import os
 

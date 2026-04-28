@@ -1,66 +1,142 @@
-#!/usr/bin/env python3
-import requests
-import time
-import json
+import pytest
+from unittest.mock import patch, MagicMock
+from fastapi.testclient import TestClient
+from fastapi import HTTPException
+from jose import jwt
+from main import app
+from utils.constants import Constants
+from services.jwt_service import SECRET_KEY, ALGORITHM
 
-BASE_URL = "http://localhost:8000/api"
 
-# Step 1: Get token
-print("Step 1: Getting JWT token...")
-response = requests.get(
-    f"{BASE_URL}/auth/token",
-    headers={"Content-Type": "application/json", "system": "silux_protecta"},
-    json={"apikey": "dBGj6XLWfyK0xkScUpJTJjRx8z4vZ4bB"}
-)
-print(f"Token response: {response.status_code}")
-token_data = response.json()
-print(f"Token data: {token_data}")
+client = TestClient(app)
 
-if "access_token" not in token_data:
-    print("ERROR: Failed to get token")
-    exit(1)
 
-access_token = token_data["access_token"]
-headers = {
-    "Content-Type": "application/json",
-    "system": "silux_protecta",
-    "Authorization": f"Bearer {access_token}"
-}
+def get_test_token():
+    token = jwt.encode({"service": "microservice"}, SECRET_KEY, algorithm=ALGORITHM)
+    return token
 
-# Step 2: Submit validation task
-print("\nStep 2: Submitting validation task...")
-response = requests.post(
-    f"{BASE_URL}/validate-invoice-duplicate",
-    headers=headers,
-    json={"invoiceIds": [1, 2, 3]}
-)
-print(f"Submit response: {response.status_code}")
-task_data = response.json()
-print(f"Task data: {json.dumps(task_data, indent=2)}")
 
-if "task_id" not in task_data:
-    print("ERROR: Failed to submit task")
-    exit(1)
+class TestAuthFlow:
+    def test_get_token_success(self):
+        with patch('routes.api.get_access_token', return_value={"access_token": "mock_token", "expires_in": 1800}):
+            response = client.request(
+                "GET",
+                "/api/auth/token",
+                headers={"Content-Type": "application/json", "system": Constants.SYSTEM_SILUX_PROTECTA},
+                json={"apikey": "dBGj6XLWfyK0xkScUpJTJjRx8z4vZ4bB"}
+            )
+            assert response.status_code == 200
+            data = response.json()
+            assert "access_token" in data
 
-task_id = task_data["task_id"]
-print(f"\nTask ID: {task_id}")
+    def test_get_token_invalid_key(self):
+        with patch('routes.api.get_access_token', side_effect=HTTPException(status_code=401, detail="Unathorized")):
+            response = client.request(
+                "GET",
+                "/api/auth/token",
+                headers={"Content-Type": "application/json", "system": Constants.SYSTEM_SILUX_PROTECTA},
+                json={"apikey": "invalid_key"}
+            )
+            assert response.status_code == 401
 
-# Step 3: Poll task status
-print("\nStep 3: Polling task status...")
-for i in range(10):
-    print(f"\nPoll attempt {i+1}:")
-    response = requests.get(f"{BASE_URL}/task-status/{task_id}")
-    status_data = response.json()
-    print(f"Status: {json.dumps(status_data, indent=2)}")
-    
-    if status_data.get("status") in ["SUCCESS", "FAILURE"]:
-        print(f"\nTask completed with status: {status_data.get('status')}")
-        if status_data.get("result"):
-            print(f"Result: {json.dumps(status_data['result'], indent=2)}")
-        if status_data.get("error"):
-            print(f"Error: {status_data['error']}")
-        break
-    
-    time.sleep(3)
 
-print("\nTest completed!")
+class TestValidationFlow:
+    @patch('routes.api.validate_duplicate_task.delay')
+    def test_submit_validation_task(self, mock_task):
+        mock_task.return_value = MagicMock(id="test-task-id")
+        token = get_test_token()
+        
+        response = client.post(
+            "/api/validate-invoices-duplicate",
+            headers={
+                "Content-Type": "application/json",
+                "system": Constants.SYSTEM_SILUX_PROTECTA,
+                "Authorization": f"Bearer {token}"
+            },
+            json={"invoiceIds": [1, 2, 3]}
+        )
+        
+        assert response.status_code == 202
+        data = response.json()
+        assert "task_id" in data
+        mock_task.assert_called_once_with([1, 2, 3], Constants.SYSTEM_SILUX_PROTECTA)
+
+    @patch('routes.api.validate_duplicate_task.delay')
+    def test_submit_validation_task_invalid_invoices(self, mock_task):
+        token = get_test_token()
+        
+        response = client.post(
+            "/api/validate-invoices-duplicate",
+            headers={
+                "Content-Type": "application/json",
+                "system": Constants.SYSTEM_SILUX_PROTECTA,
+                "Authorization": f"Bearer {token}"
+            },
+            json={"invoiceIds": []}
+        )
+        
+        assert response.status_code == 422
+
+
+class TestTaskStatus:
+    @patch('routes.api.celery_app.AsyncResult')
+    def test_get_task_status_pending(self, mock_async_result):
+        mock_result = MagicMock()
+        mock_result.state = "PENDING"
+        mock_result.result = None
+        mock_async_result.return_value = mock_result
+        
+        response = client.get("/api/task-status/test-task-id")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "PENDING"
+
+    @patch('routes.api.celery_app.AsyncResult')
+    def test_get_task_status_success(self, mock_async_result):
+        mock_result = MagicMock()
+        mock_result.state = "SUCCESS"
+        mock_result.result = {"success": True, "msg": "Completed", "total": 3}
+        mock_async_result.return_value = mock_result
+        
+        response = client.get("/api/task-status/test-task-id")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "SUCCESS"
+        assert data["result"]["success"] is True
+
+    @patch('routes.api.celery_app.AsyncResult')
+    def test_get_task_status_failure(self, mock_async_result):
+        mock_result = MagicMock()
+        mock_result.state = "FAILURE"
+        mock_result.result = "Task failed"
+        mock_async_result.return_value = mock_result
+        
+        response = client.get("/api/task-status/test-task-id")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "FAILURE"
+
+
+class TestResetInvoicesFlow:
+    @patch('routes.api.update_reset_invoices_task.delay')
+    def test_reset_invoices(self, mock_task):
+        mock_task.return_value = MagicMock(id="reset-task-id")
+        token = get_test_token()
+        
+        response = client.put(
+            "/api/update-reset-invoices",
+            headers={
+                "Content-Type": "application/json",
+                "system": Constants.SYSTEM_SILUX_PROTECTA,
+                "Authorization": f"Bearer {token}"
+            },
+            json={"invoiceIds": [1, 2, 3]}
+        )
+        
+        assert response.status_code == 202
+        data = response.json()
+        assert "task_id" in data
+        mock_task.assert_called_once_with([1, 2, 3], Constants.SYSTEM_SILUX_PROTECTA)

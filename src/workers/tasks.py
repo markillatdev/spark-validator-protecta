@@ -2,7 +2,7 @@ from core.celery_app import celery_app
 from config.spark_config import get_spark_session
 from config.db_connection import create_db_connection
 from core.protecta_core import ProtectaCore
-from services.validate.validation_service import ValidationService
+from services.validator.validation_service import ValidationService
 from services.loader.data_loader_service import DataFrameLoader
 from typing import List
 import logging

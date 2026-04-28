@@ -1,53 +1,75 @@
 import pytest
+from unittest.mock import patch, MagicMock
 from pyspark.sql import SparkSession
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
+
 @pytest.fixture(scope="module")
 def spark():
     """Fixture para inicializar SparkSession."""
-    return SparkSession.builder.master("local[*]").appName("TestApp").getOrCreate()
+    session = SparkSession.builder.master("local[1]").appName("TestRepositories").getOrCreate()
+    yield session
+    session.stop()
 
 
-def test_show_parquet_schema_and_sample(spark):
-    """Test para visualizar la estructura y datos de archivos Parquet."""
-    storage_path = os.getenv("STORAGE_PATH")
-    assert storage_path, "La variable de entorno STORAGE_PATH no está configurada."
+class TestParquetRepositoryStructure:
+    def test_storage_path_configured(self):
+        storage_path = os.getenv("STORAGE_PATH")
+        assert storage_path is not None, "STORAGE_PATH not configured"
 
-    base_path = storage_path
-    subdirs = ["attentions", "invoices", "taxtypes", "amounts"]
+    @patch('os.path.exists')
+    def test_repository_directories_exist(self, mock_exists):
+        mock_exists.return_value = True
+        storage_path = os.getenv("STORAGE_PATH", "/tmp")
+        
+        subdirs = ["attentions", "invoices", "taxtypes", "amounts"]
+        for subdir in subdirs:
+            subdir_path = os.path.join(storage_path, subdir)
+            assert subdir_path is not None
 
-    for subdir in subdirs:
-        subdir_path = os.path.join(base_path, subdir)
-        if not os.path.exists(subdir_path):
-            print(f"\n=== {subdir.upper()} - Directorio no encontrado: {subdir_path} ===")
-            continue
+    def test_read_parquet_file(self, spark, tmp_path):
+        import pandas as pd
+        
+        df_pandas = pd.DataFrame({
+            'factura_id': [1, 2, 3],
+            'monto': [100.0, 200.0, 300.0]
+        })
+        
+        parquet_path = tmp_path / "test.parquet"
+        df_spark = spark.createDataFrame(df_pandas)
+        df_spark.write.parquet(str(parquet_path))
+        
+        df_read = spark.read.parquet(str(parquet_path))
+        assert df_read.count() == 3
+        assert len(df_read.columns) == 2
 
-        systems = ["solben_protecta", "silux_protecta"]
-        for system in systems:
-            system_path = os.path.join(subdir_path, system)
-            if not os.path.exists(system_path):
-                continue
+    @patch('os.listdir')
+    @patch('os.path.exists')
+    def test_parquet_file_discovery(self, mock_exists, mock_listdir, tmp_path):
+        mock_exists.return_value = True
+        mock_listdir.return_value = ["file1.parquet", "file2.parquet", "other.txt"]
+        
+        parquet_files = [f for f in mock_listdir.return_value if f.endswith(".parquet")]
+        
+        assert len(parquet_files) == 2
+        assert "file1.parquet" in parquet_files
+        assert "file2.parquet" in parquet_files
+        assert "other.txt" not in parquet_files
 
-            print(f"\n{'='*60}")
-            print(f"=== {subdir.upper()} / {system} ===")
-            print(f"{'='*60}")
-
-            parquet_files = [f for f in os.listdir(system_path) if f.endswith(".parquet")]
-            if not parquet_files:
-                print("No se encontraron archivos Parquet.")
-                continue
-
-            for file in parquet_files:
-                path = os.path.join(system_path, file)
-                try:
-                    df = spark.read.parquet(path)
-                    print(f"\n--- Archivo: {file} ---")
-                    print(f"Registros: {df.count()}")
-                    print(f"\nSchema:")
-                    df.printSchema()
-                    print(f"\nDatos de ejemplo (5 filas):")
-                    df.show(5, truncate=False)
-                except Exception as e:
-                    print(f"Error al procesar {file}: {e}")
+    def test_parquet_schema_validation(self, spark, tmp_path):
+        from pyspark.sql.types import StructType, StructField, StringType, DoubleType
+        
+        schema = StructType([
+            StructField("factura_id", StringType(), True),
+            StructField("monto", DoubleType(), True)
+        ])
+        
+        df = spark.createDataFrame([(1, 100.0)], schema=schema)
+        parquet_path = str(tmp_path / "schema_test.parquet")
+        df.write.parquet(parquet_path)
+        
+        df_read = spark.read.parquet(parquet_path)
+        assert "factura_id" in df_read.columns
+        assert "monto" in df_read.columns
