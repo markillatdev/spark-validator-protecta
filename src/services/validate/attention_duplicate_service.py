@@ -1,7 +1,5 @@
-import os
-from typing import List
+from typing import List, Dict
 from pyspark.sql.functions import col, collect_list, count
-from config.database import PARQUET_ATTENTIONS_PATHS
 from config.db_connection import read_table_from_db
 from services.validate.update_service import InvoiceUpdate
 from pyspark.sql import SparkSession, DataFrame
@@ -25,23 +23,23 @@ class AttentionDuplicateHandler:
         self.message = "Duplicidad Caso 2"
     
 
-    def procesar_atenciones(self, dataFrame: DataFrame, system: List[str], invoiceIds: List[int]):
+    def procesar_atenciones(self, dataFrame: DataFrame, system: Dict, invoiceIds: List[int]):
         df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_ordenes_with_ids(invoiceIds), self.coreSystem)
         df_facturas_por_validar = self.createDataFrameInvoice(df_facturas_buscar)
         self.invoice_updater.update_spark_processing(invoiceIds)
 
         if df_facturas_por_validar.count() == 0:
             print("No hay facturas pendientes por procesar.")
-            break
+            return
         
         df_liquidaciones = (
-            dataFrame if system.get("load_dataframes") else 
+            dataFrame if system.get("load_dataframes") and dataFrame is not None else 
             read_table_from_db(self.spark, db_table_medden_ordenes, system['name'])
         )                            
 
         if df_liquidaciones is None:
             print(f"No se pudieron cargar datos para el sistema: {system['name']}")
-            continue 
+            return
         
         print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
 

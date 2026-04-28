@@ -1,7 +1,5 @@
-import os
-from typing import List
+from typing import List, Dict
 from pyspark.sql.functions import col, collect_list, count
-from config.database import PARQUET_TAXTYPE_PATHS
 from config.db_connection import read_table_from_db
 from services.validate.update_service import InvoiceUpdate
 from pyspark.sql import SparkSession, DataFrame
@@ -25,23 +23,23 @@ class TaxTypeDuplicateHandler:
         self.message = "Duplicidad Caso 3"
     
 
-    def procesar_tipo_impuesto(self, dataFrame: DataFrame, system: List[str], invoiceIds: List[int]):
+    def procesar_tipo_impuesto(self, dataFrame: DataFrame, system: Dict, invoiceIds: List[int]):
         df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_taxtypes_with_ids(invoiceIds), self.coreSystem)
         df_facturas_por_validar = self.createDataFrameInvoice(df_facturas_buscar)
         self.invoice_updater.update_spark_processing(invoiceIds)
 
         if df_facturas_por_validar.count() == 0:
             print("No hay facturas pendientes por procesar.")
-            break
+            return
         
         df_liquidaciones = (
-            dataFrame if system.get("load_dataframes") else 
+            dataFrame if system.get("load_dataframes") and dataFrame is not None else 
             read_table_from_db(self.spark, db_table_medden_impuestos, system['name'])
         )                            
 
         if df_liquidaciones is None:
             print(f"No se pudieron cargar datos para el sistema: {system['name']}")
-            continue 
+            return
         
         print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
 
@@ -98,6 +96,7 @@ class TaxTypeDuplicateHandler:
                         print(f"Factura {factura_id} actualizada con la observación: {self.message} con estado {estado_id}")
                 else:
                     print(f"El estado {estado_id} no esta contemplado")
+
 
     def createDataFrameInvoice(self, df_facturas_buscar: DataFrame) -> DataFrame:
         query_results = df_facturas_buscar.collect()

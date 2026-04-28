@@ -5,57 +5,13 @@ from services.loader.data_loader_service import DataFrameLoader
 from services.jwt_service import *
 from services.validate.test_dataframe_service import testDataframeService
 from core.celery_app import celery_app
-from workers.tasks import (
-    validate_invoices_task,
-    validate_attention_task,
-    validate_taxtypes_task,
-    validate_amounts_task,
-    update_invoices_unique_task,
-    update_reset_invoices_task,
-    validate_duplicate_task
-)
+from workers.tasks import validate_duplicate_task
 
 router = APIRouter()
 
 @router.get("/auth/token", status_code=status.HTTP_200_OK, response_model=JwtSchema)
 async def generateToken(data: ApiKeySchema):
     return get_access_token(data.apikey)
-
-@router.post("/validate-invoice-duplicate", status_code=status.HTTP_202_ACCEPTED, response_model=TaskResponseSchema)
-async def validateInternalInvoiceDuplicate(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):
-    system = request.headers.get("system")
-    task = validate_invoices_task.delay(schema.invoiceIds, system)
-    return {"task_id": task.id, "status": "PENDING", "msg": "Tarea de validación de facturas enviada"}
-
-@router.post("/validate-attention-import-duplicate", status_code=status.HTTP_202_ACCEPTED, response_model=TaskResponseSchema)
-async def validateInternalAttentionDuplicateImport(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):
-    system = request.headers.get("system")
-    task = validate_attention_task.delay(schema.invoiceIds, system)
-    return {"task_id": task.id, "status": "PENDING", "msg": "Tarea de validación de atenciones enviada"}
-
-@router.post("/validate-taxtypes-duplicate", status_code=status.HTTP_202_ACCEPTED, response_model=TaskResponseSchema)
-async def validateInternalTaxTypeDuplicateImport(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):
-    system = request.headers.get("system")
-    task = validate_taxtypes_task.delay(schema.invoiceIds, system)
-    return {"task_id": task.id, "status": "PENDING", "msg": "Tarea de validación de tipos de impuesto enviada"}
-
-@router.post("/validate-amounts-duplicate", status_code=status.HTTP_202_ACCEPTED, response_model=TaskResponseSchema)
-async def validateInternalAmountDuplicateImport(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):
-    system = request.headers.get("system")
-    task = validate_amounts_task.delay(schema.invoiceIds, system)
-    return {"task_id": task.id, "status": "PENDING", "msg": "Tarea de validación de montos enviada"}
-
-@router.post("/update-invoices-unique", status_code=status.HTTP_202_ACCEPTED, response_model=TaskResponseSchema)
-async def updateInvoiceUnique(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):
-    system = request.headers.get("system")
-    task = update_invoices_unique_task.delay(schema.invoiceIds, system)
-    return {"task_id": task.id, "status": "PENDING", "msg": "Tarea de actualización de facturas únicas enviada"}
-
-@router.put("/update-reset-invoices", status_code=status.HTTP_202_ACCEPTED, response_model=TaskResponseSchema)
-async def updateResetInvoice(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):
-    system = request.headers.get("system")
-    task = update_reset_invoices_task.delay(schema.invoiceIds, system)
-    return {"task_id": task.id, "status": "PENDING", "msg": "Tarea de reseteo de facturas enviada"}
 
 @router.post("/validate-invoices-duplicate", status_code=status.HTTP_202_ACCEPTED, response_model=TaskResponseSchema)
 async def validateInvoiceDuplicate(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):

@@ -1,5 +1,4 @@
-import os
-from typing import List
+from typing import List, Dict
 from pyspark.sql.functions import col, collect_list, count
 from services.validate.update_service import InvoiceUpdate
 from config.db_connection import read_table_from_db
@@ -25,24 +24,23 @@ class InvoiceDuplicateHandler:
         self.message = "Duplicidad Caso 1"
     
 
-    def procesar_facturas(self, dataFrame: DataFrame, system: List[str], invoiceIds: List[int]):
+    def procesar_facturas(self, dataFrame: DataFrame, system: Dict, invoiceIds: List[int]):
         df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_facturas_with_ids(invoiceIds), self.coreSystem)
         df_facturas_por_validar = self.createDataFrameInvoice(df_facturas_buscar)
         self.invoice_updater.update_spark_processing(invoiceIds)
 
-
         if df_facturas_por_validar.count() == 0:
             print("No hay facturas pendientes por procesar.")
-            break
+            return
         
         df_liquidaciones = (
-            dataFrame if system.get("load_dataframes") else 
+            dataFrame if system.get("load_dataframes") and dataFrame is not None else 
             read_table_from_db(self.spark, db_table_medden_facturas, system['name'])
         )                     
         
         if df_liquidaciones is None:
             print(f"No se pudieron cargar datos para el sistema: {system['name']}")
-            continue 
+            return
 
         print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
 
