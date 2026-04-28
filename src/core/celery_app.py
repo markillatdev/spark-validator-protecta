@@ -24,3 +24,5 @@ celery_app.conf.update(
     task_time_limit=1800,
     task_soft_time_limit=1500,
 )
+
+import workers.tasks as tasks # Import tasks to register them with the Celery app

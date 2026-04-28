@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pydantic import BaseModel, ConfigDict, field_validator
 from utils.constants import Constants
 
@@ -131,8 +131,8 @@ class TaskResponseSchema(BaseModel):
 class TaskStatusSchema(BaseModel):
     task_id: str
     status: str
-    result: dict | None = None
-    error: str | None = None
+    result: Optional[Dict] = None
+    error: Optional[str] = None
 
     model_config = ConfigDict(
         json_schema_extra={

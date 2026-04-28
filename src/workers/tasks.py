@@ -1,4 +1,4 @@
-from celery_app import celery_app
+from core.celery_app import celery_app
 from config.spark_config import get_spark_session
 from config.db_connection import create_db_connection
 from core.protecta_core import ProtectaCore

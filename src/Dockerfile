@@ -20,13 +20,13 @@ ENV PATH=$JAVA_HOME/bin:$PATH
 
 # Descargar e instalar Apache Spark
 ENV SPARK_VERSION=3.5.3
-RUN wget https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz \
+RUN wget --timeout=30 --tries=3 --progress=dot:giga https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz \
     && tar -xzf spark-$SPARK_VERSION-bin-hadoop3.tgz -C /opt \
     && ln -s /opt/spark-$SPARK_VERSION-bin-hadoop3 /opt/spark \
     && rm spark-$SPARK_VERSION-bin-hadoop3.tgz
 
 # Descargar el conector JDBC de MySQL y moverlo al directorio de Spark
-RUN wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-8.0.29.tar.gz -P /tmp/ && \
+RUN wget --timeout=30 --tries=3 --progress=dot:giga https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-8.0.29.tar.gz -P /tmp/ && \
     tar -xvzf /tmp/mysql-connector-java-8.0.29.tar.gz -C /tmp/ && \
     mv /tmp/mysql-connector-java-8.0.29/mysql-connector-java-8.0.29.jar /opt/spark/jars/ && \
     rm -rf /tmp/*

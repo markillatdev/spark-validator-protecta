@@ -4,8 +4,8 @@ from services.loader.count_dataframe_service import CountDataframe
 from services.loader.data_loader_service import DataFrameLoader
 from services.jwt_service import *
 from services.validate.test_dataframe_service import testDataframeService
-from celery_app import celery_app
-from tasks import (
+from core.celery_app import celery_app
+from workers.tasks import (
     validate_invoices_task,
     validate_attention_task,
     validate_taxtypes_task,
