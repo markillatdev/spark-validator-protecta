@@ -25,40 +25,38 @@ class AmountDuplicateHandler:
         self.message = "Duplicidad Caso 4"
     
 
-    def procesar_montos(self, systems_validate: List[str], invoiceIds: List[int]):
+    def procesar_montos(self, dataFrame: DataFrame, system: List[str], invoiceIds: List[int]):
         df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_amount_with_ids(invoiceIds), self.coreSystem)
         df_facturas_por_validar = self.createDataFrameInvoice(df_facturas_buscar)
         self.invoice_updater.update_spark_processing(invoiceIds)
 
-        for system in systems_validate:
+        if df_facturas_por_validar.count() == 0:
+            print("No hay facturas pendientes por procesar.")
+            break
+        
+        df_liquidaciones = (
+            dataFrame if system.get("load_dataframes") else 
+            read_table_from_db(self.spark, db_table_medden_montos, system['name'])
+        )                            
 
-            if df_facturas_por_validar.count() == 0:
-                print("No hay facturas pendientes por procesar.")
-                break
-            
-            df_liquidaciones = (
-                self.load_dataframes(system['name']) if system.get("load_dataframes") else 
-                read_table_from_db(self.spark, db_table_medden_montos, system['name'])
-            )                            
+        if df_liquidaciones is None:
+            print(f"No se pudieron cargar datos para el sistema: {system['name']}")
+            continue 
+        
+        print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
 
-            if df_liquidaciones is None:
-                print(f"No se pudieron cargar datos para el sistema: {system['name']}")
-                continue 
-            
-            print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
+        df_facturas_filtradas = df_liquidaciones.join(
+            df_facturas_por_validar.select("codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "monto", "tipo_impuesto").distinct(),
+            on=["codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "monto", "tipo_impuesto"], 
+            how="inner"
+        )
 
-            df_facturas_filtradas = df_liquidaciones.join(
-                df_facturas_por_validar.select("codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "monto", "tipo_impuesto").distinct(),
-                on=["codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "monto", "tipo_impuesto"], 
-                how="inner"
-            )
+        df_facturas_filtradas = df_facturas_filtradas.groupBy("codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "monto", "tipo_impuesto").agg(
+            count("factura_id").alias("count"),
+            collect_list("factura_id").alias("factura_ids"),
+        )
 
-            df_facturas_filtradas = df_facturas_filtradas.groupBy("codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "monto", "tipo_impuesto").agg(
-                count("factura_id").alias("count"),
-                collect_list("factura_id").alias("factura_ids"),
-            )
-
-            self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
+        self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
         
 
     def buscar_duplicados(self, df_facturas_filtradas: DataFrame, df_facturas_buscar: DataFrame, system: str):

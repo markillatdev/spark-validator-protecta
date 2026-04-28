@@ -31,3 +31,6 @@ class ProtectaCore(BaseMain):
 
     def execute_reset_invoices(self, invoiceIds: List[int]):
         self.update_reset_invoices(invoiceIds)
+
+    def execute_tasks(self, invoiceIds: List[int]):
+        self.validate_duplicate(self.systems(), invoiceIds)

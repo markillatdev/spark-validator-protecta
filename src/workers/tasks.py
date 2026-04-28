@@ -95,3 +95,20 @@ def update_reset_invoices_task(self, invoiceIds: List[int], system: str):
     except Exception as e:
         logger.error(f"Error en update_reset_invoices_task: {str(e)}")
         return {"success": False, "msg": f"Error: {str(e)}", "total": 0}
+
+
+@celery_app.task(bind=True)
+def validate_duplicate_task(self, invoiceIds: List[int], system: str):
+    try:
+        logger.info(f"Iniciando validación para system={system}, invoices={invoiceIds}")
+        spark = get_spark_session()
+        if spark is None:
+            return {"success": False, "msg": "No se pudo crear SparkSession", "total": 0}
+
+        core = ProtectaCore(system)
+        core.execute_tasks(invoiceIds)
+        
+        return {"success": True, "msg": "Validación de atenciones completada", "total": len(invoiceIds)}
+    except Exception as e:
+        logger.error(f"Error en validate_duplicate_task: {str(e)}")
+        return {"success": False, "msg": f"Error: {str(e)}", "total": 0}

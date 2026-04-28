@@ -11,7 +11,8 @@ from workers.tasks import (
     validate_taxtypes_task,
     validate_amounts_task,
     update_invoices_unique_task,
-    update_reset_invoices_task
+    update_reset_invoices_task,
+    validate_duplicate_task
 )
 
 router = APIRouter()
@@ -55,6 +56,12 @@ async def updateResetInvoice(schema: InvoiceSchema, request: Request, token: str
     system = request.headers.get("system")
     task = update_reset_invoices_task.delay(schema.invoiceIds, system)
     return {"task_id": task.id, "status": "PENDING", "msg": "Tarea de reseteo de facturas enviada"}
+
+@router.post("/validate-invoices-duplicate", status_code=status.HTTP_202_ACCEPTED, response_model=TaskResponseSchema)
+async def validateInvoiceDuplicate(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):
+    system = request.headers.get("system")
+    task = validate_duplicate_task.delay(schema.invoiceIds, system)
+    return {"task_id": task.id, "status": "PENDING", "msg": "Tarea de validación enviada"}
 
 @router.get("/task-status/{task_id}", status_code=status.HTTP_200_OK, response_model=TaskStatusSchema)
 async def getTaskStatus(task_id: str):

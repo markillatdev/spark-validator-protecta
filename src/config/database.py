@@ -38,3 +38,8 @@ PARQUET_AMOUNT_PATHS = {
     Constants.SYSTEM_SOLBEN_PROTECTA: f'{os.getenv("STORAGE_PATH")}/amounts/{Constants.SYSTEM_SOLBEN_PROTECTA}/*.parquet',
     Constants.SYSTEM_SILUX_PROTECTA: f'{os.getenv("STORAGE_PATH")}/amounts/{Constants.SYSTEM_SILUX_PROTECTA}/*.parquet',
 }
+
+PARQUET_PATHS = {
+    Constants.SYSTEM_SOLBEN_PROTECTA: f'{os.getenv("STORAGE_PATH")}/{Constants.SYSTEM_SOLBEN_PROTECTA}/*.parquet',
+    Constants.SYSTEM_SILUX_PROTECTA: f'{os.getenv("STORAGE_PATH")}/{Constants.SYSTEM_SILUX_PROTECTA}/*.parquet',
+}

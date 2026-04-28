@@ -25,40 +25,38 @@ class AttentionDuplicateHandler:
         self.message = "Duplicidad Caso 2"
     
 
-    def procesar_atenciones(self, systems_validate: List[str], invoiceIds: List[int]):
+    def procesar_atenciones(self, dataFrame: DataFrame, system: List[str], invoiceIds: List[int]):
         df_facturas_buscar = read_table_from_db(self.spark, db_table_validacion_ordenes_with_ids(invoiceIds), self.coreSystem)
         df_facturas_por_validar = self.createDataFrameInvoice(df_facturas_buscar)
         self.invoice_updater.update_spark_processing(invoiceIds)
 
-        for system in systems_validate:
+        if df_facturas_por_validar.count() == 0:
+            print("No hay facturas pendientes por procesar.")
+            break
+        
+        df_liquidaciones = (
+            dataFrame if system.get("load_dataframes") else 
+            read_table_from_db(self.spark, db_table_medden_ordenes, system['name'])
+        )                            
 
-            if df_facturas_por_validar.count() == 0:
-                print("No hay facturas pendientes por procesar.")
-                break
-            
-            df_liquidaciones = (
-                self.load_dataframes(system['name']) if system.get("load_dataframes") else 
-                read_table_from_db(self.spark, db_table_medden_ordenes, system['name'])
-            )                            
+        if df_liquidaciones is None:
+            print(f"No se pudieron cargar datos para el sistema: {system['name']}")
+            continue 
+        
+        print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
 
-            if df_liquidaciones is None:
-                print(f"No se pudieron cargar datos para el sistema: {system['name']}")
-                continue 
-            
-            print(f"validando desde el sistema de {system['name']}, cantidad {df_facturas_por_validar.count()}")
+        df_facturas_filtradas = df_liquidaciones.join(
+            df_facturas_por_validar.select("codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "nro_solben", "monto").distinct(),
+            on=["codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "nro_solben", "monto"], 
+            how="inner"
+        )
 
-            df_facturas_filtradas = df_liquidaciones.join(
-                df_facturas_por_validar.select("codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "nro_solben", "monto").distinct(),
-                on=["codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "nro_solben", "monto"], 
-                how="inner"
-            )
+        df_facturas_filtradas = df_facturas_filtradas.groupBy("codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "nro_solben", "monto").agg(
+            count("factura_id").alias("count"),
+            collect_list("factura_id").alias("factura_ids"),
+        )
 
-            df_facturas_filtradas = df_facturas_filtradas.groupBy("codigo_iafa", "ruc_proveedor", "codigo_afiliado", "fch_atencion", "nro_solben", "monto").agg(
-                count("factura_id").alias("count"),
-                collect_list("factura_id").alias("factura_ids"),
-            )
-
-            self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
+        self.buscar_duplicados(df_facturas_filtradas, df_facturas_buscar, system['name'])
         
 
     def buscar_duplicados(self, df_facturas_filtradas: DataFrame, df_facturas_buscar: DataFrame, system: str):
@@ -99,15 +97,7 @@ class AttentionDuplicateHandler:
                         self.invoice_updater.update_invoices_detected(observation, factura_id, system, factura_ids_filtrados)
                         print(f"Factura {factura_id} actualizada con la observación: {self.message} con estado {estado_id}")
                 else:
-                    print(f"El estado {estado_id} no esta contemplado")        
-
-
-    def load_dataframes(self, system: str):
-        path = PARQUET_ATTENTIONS_PATHS.get(system)
-        directory = os.path.dirname(path)
-        if not os.path.exists(directory):
-            return None
-        return self.spark.read.parquet(path) if path else None
+                    print(f"El estado {estado_id} no esta contemplado")
 
 
     def createDataFrameInvoice(self, df_facturas_buscar: DataFrame) -> DataFrame:

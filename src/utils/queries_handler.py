@@ -15,13 +15,13 @@ def db_table_validacion_facturas_with_ids(invoiceIds: List[int]) -> str:
                 l.codigo_afiliado,
                 l.fecha AS fch_atencion,
                 CASE
-                    WHEN LENGTH(l.numero_segunda_solicitud) = 8
-                    THEN l.numero_segunda_solicitud
-                    ELSE l.numero_de_solben
-                END AS nro_solben,
+                    WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
+                    ELSE ls.code_solben
+                END as nro_solben,
                 f.monto
                 FROM factura f
                 INNER JOIN liqtempo l ON l.factura_id = f.id
+                INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
                 INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
                 INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
                 WHERE fv.factura_id IN ({ids})
@@ -40,13 +40,13 @@ db_table_medden_facturas = """
     l.codigo_afiliado,
     l.fecha AS fch_atencion,
     CASE
-        WHEN LENGTH(l.numero_segunda_solicitud) = 8
-        THEN l.numero_segunda_solicitud
-        ELSE l.numero_de_solben
-    END AS nro_solben,
+        WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
+        ELSE ls.code_solben
+    END as nro_solben,
     f.monto
     FROM factura f
     INNER JOIN liqtempo l ON l.factura_id = f.id
+    INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
     INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
     WHERE f.id_estado IN (9, 10, 13, 15, 16, 17, 18)
     AND YEAR(f.created_at) BETWEEN YEAR(NOW()) - 1 AND YEAR(NOW())
@@ -67,10 +67,9 @@ def db_table_validacion_ordenes_with_ids(invoiceIds: List[int]) -> str:
                 l.codigo_afiliado,
                 l.fecha AS fch_atencion,
                 CASE
-                    WHEN LENGTH(l.numero_segunda_solicitud) = 8
-                    THEN l.numero_segunda_solicitud
-                    ELSE l.numero_de_solben
-                END AS nro_solben,
+                    WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
+                    ELSE ls.code_solben
+                END as nro_solben,
                 f.monto
                 FROM factura f 
                 INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
@@ -91,10 +90,9 @@ db_table_medden_ordenes = """
     l.codigo_afiliado,
     l.fecha AS fch_atencion,
     CASE
-        WHEN LENGTH(l.numero_segunda_solicitud) = 8
-        THEN l.numero_segunda_solicitud
-        ELSE l.numero_de_solben
-    END AS nro_solben,
+        WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
+        ELSE ls.code_solben
+    END as nro_solben,
     f.monto AS monto
     FROM factura f
     INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
@@ -118,10 +116,9 @@ def db_table_validacion_taxtypes_with_ids(invoiceIds: List[int]) -> str:
                 l.codigo_afiliado,
                 l.fecha AS fch_atencion,
                 CASE
-                    WHEN LENGTH(l.numero_segunda_solicitud) = 8
-                    THEN l.numero_segunda_solicitud
-                    ELSE l.numero_de_solben
-                END AS nro_solben,
+                    WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
+                    ELSE ls.code_solben
+                END as nro_solben,
                 l.tipo_impuesto_id as tipo_impuesto
                 FROM factura f 
                 INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
@@ -141,10 +138,9 @@ db_table_medden_impuestos = """
     l.codigo_afiliado,
     l.fecha AS fch_atencion,
     CASE
-        WHEN LENGTH(l.numero_segunda_solicitud) = 8
-        THEN l.numero_segunda_solicitud
-        ELSE l.numero_de_solben
-    END AS nro_solben,
+        WHEN ls.code_solben IS NULL OR ls.code_solben = "" THEN ls.nro_autoriza
+        ELSE ls.code_solben
+    END as nro_solben,
     l.tipo_impuesto_id as tipo_impuesto
     FROM factura f
     INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
@@ -173,7 +169,6 @@ def db_table_validacion_amount_with_ids(invoiceIds: List[int]) -> str:
                 INNER JOIN factura_validaciones fv ON fv.factura_id = f.id
                 INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
                 INNER JOIN liqtempo l ON l.factura_id = f.id
-                INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
                 WHERE fv.factura_id IN ({ids})
             ) AS subquery"""
     return query
@@ -191,7 +186,6 @@ db_table_medden_montos = """
     FROM factura f
     INNER JOIN factura_proveedor fp ON fp.factura_id = f.id
     INNER JOIN liqtempo l ON l.factura_id = f.id
-    INNER JOIN liqtempo_solben ls ON ls.liqtempo_id = l.id
     WHERE l.id_estado IN (9, 10, 13, 15, 16, 17, 18)
     AND YEAR(l.created_at) BETWEEN YEAR(NOW()) - 1 AND YEAR(NOW())
 ) AS subquery"""
