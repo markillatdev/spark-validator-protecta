@@ -3,6 +3,7 @@ from config.spark_config import get_spark_session
 from config.db_connection import create_db_connection
 from core.protecta_core import ProtectaCore
 from services.validate.validation_service import ValidationService
+from services.loader.data_loader_service import DataFrameLoader
 from typing import List
 import logging
 
@@ -35,6 +36,18 @@ def update_reset_invoices_task(self, invoiceIds: List[int], system: str):
         core.execute_reset_invoices(invoiceIds)
         
         return {"success": True, "msg": "Reseteo de facturas completado", "total": len(invoiceIds)}
+    except Exception as e:
+        logger.error(f"Error en update_reset_invoices_task: {str(e)}")
+        return {"success": False, "msg": f"Error: {str(e)}", "total": 0}
+
+@celery_app.task(bind=True)
+def load_dataframe_to_database_task(self, years: List[int], origen: str, system: str):
+    try:
+        logger.info(f"Iniciando proceso de carga para system={system}")
+        service = DataFrameLoader(system)
+        service.load_data(years, origen)
+        
+        return {"success": True, "msg": "Proceso de carga completado", "total": 0}
     except Exception as e:
         logger.error(f"Error en update_reset_invoices_task: {str(e)}")
         return {"success": False, "msg": f"Error: {str(e)}", "total": 0}

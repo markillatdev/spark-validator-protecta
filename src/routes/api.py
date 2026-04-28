@@ -5,7 +5,7 @@ from services.loader.data_loader_service import DataFrameLoader
 from services.jwt_service import *
 from services.validate.test_dataframe_service import testDataframeService
 from core.celery_app import celery_app
-from workers.tasks import validate_duplicate_task, update_reset_invoices_task
+from workers.tasks import validate_duplicate_task, update_reset_invoices_task, load_dataframe_to_database_task
 
 router = APIRouter()
 
@@ -40,10 +40,11 @@ async def updateResetInvoice(schema: InvoiceSchema, request: Request, token: str
     task = update_reset_invoices_task.delay(schema.invoiceIds, system)
     return {"task_id": task.id, "status": "PENDING", "msg": "Tarea de reseteo de facturas enviada"}
 
-@router.post("/load-dataframe-to-database", status_code=status.HTTP_200_OK, response_model=responseBasicSchema)
+@router.post("/load-dataframe-to-database", status_code=status.HTTP_200_OK, response_model=TaskResponseSchema)
 async def loadDataFrameToDatabase(schema: DataFrameSchema, request: Request, token: str = Depends(verify_token)):
-    service = DataFrameLoader(request.headers.get("system"))
-    return service.load_data(schema.years, schema.origen)
+    system = request.headers.get("system")
+    task = load_dataframe_to_database_task.delay(schema.years, schema.origen, system)
+    return {"task_id": task.id, "status": "PENDING", "msg": "En proceso de carga"}
 
 @router.delete("/destroy-dataframe", status_code=status.HTTP_200_OK, response_model=responseBasicSchema)
 async def deleteDataframe(schema: DestroyDataFrameSchema, request: Request, token: str = Depends(verify_token)):
