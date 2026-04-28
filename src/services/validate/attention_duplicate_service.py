@@ -33,7 +33,7 @@ class AttentionDuplicateHandler:
             return
         
         df_liquidaciones = (
-            dataFrame if system.get("load_dataframes") and dataFrame is not None else 
+            dataFrame if system.get("load_dataframes") else 
             read_table_from_db(self.spark, db_table_medden_ordenes, system['name'])
         )                            
 

@@ -32,9 +32,9 @@ class InvoiceDuplicateHandler:
         if df_facturas_por_validar.count() == 0:
             print("No hay facturas pendientes por procesar.")
             return
-        
+
         df_liquidaciones = (
-            dataFrame if system.get("load_dataframes") and dataFrame is not None else 
+            dataFrame if system.get("load_dataframes") else 
             read_table_from_db(self.spark, db_table_medden_facturas, system['name'])
         )                     
         

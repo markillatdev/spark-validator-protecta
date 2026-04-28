@@ -5,7 +5,7 @@ from services.loader.data_loader_service import DataFrameLoader
 from services.jwt_service import *
 from services.validate.test_dataframe_service import testDataframeService
 from core.celery_app import celery_app
-from workers.tasks import validate_duplicate_task
+from workers.tasks import validate_duplicate_task, update_reset_invoices_task
 
 router = APIRouter()
 
@@ -33,6 +33,12 @@ async def getTaskStatus(task_id: str):
         result = task.info
     
     return {"task_id": task_id, "status": task.state, "result": result, "error": error}
+
+@router.put("/update-reset-invoices", status_code=status.HTTP_202_ACCEPTED, response_model=TaskResponseSchema)
+async def updateResetInvoice(schema: InvoiceSchema, request: Request, token: str = Depends(verify_token)):
+    system = request.headers.get("system")
+    task = update_reset_invoices_task.delay(schema.invoiceIds, system)
+    return {"task_id": task.id, "status": "PENDING", "msg": "Tarea de reseteo de facturas enviada"}
 
 @router.post("/load-dataframe-to-database", status_code=status.HTTP_200_OK, response_model=responseBasicSchema)
 async def loadDataFrameToDatabase(schema: DataFrameSchema, request: Request, token: str = Depends(verify_token)):
