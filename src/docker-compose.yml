@@ -1,7 +1,7 @@
 version: '3.8'
 
 networks:
-    spark_network_protecta:
+    spark_network:
         driver: bridge
 
 services:
@@ -11,7 +11,9 @@ services:
             context: .
             dockerfile: Dockerfile
         networks: 
-            - spark_network_protecta
+            - spark_network
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         ports:
             - '8081:8080'
             - '8001:8000'
