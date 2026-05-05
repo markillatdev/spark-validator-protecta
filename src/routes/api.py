@@ -45,7 +45,7 @@ async def loadDataFrameToDatabase(schema: DataFrameSchema, request: Request, tok
     task = load_dataframe_to_database_task.delay(schema.years, schema.origen, system)
     return {"task_id": task.id, "status": "PENDING", "msg": "En proceso de carga"}
 
-@router.delete("/destroy-dataframe", status_code=status.HTTP_200_OK, response_model=responseBasicSchema)
+@router.post("/destroy-dataframe", status_code=status.HTTP_200_OK, response_model=responseBasicSchema)
 async def deleteDataframe(schema: DestroyDataFrameSchema, request: Request, token: str = Depends(verify_token)):
     service = DataFrameLoader(request.headers.get("system"))
     return service.destroy_dataframe(schema.origen)

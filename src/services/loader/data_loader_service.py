@@ -108,6 +108,7 @@ class DataFrameLoader:
             removed = []
             path = os.path.join(storage_path, origen)
             if os.path.exists(path):
+                removed.append(path)
                 shutil.rmtree(path)
             return {"msg": f"Directorios eliminados: {', '.join(removed) or 'ninguno'}", "success": True}
         except Exception as e:

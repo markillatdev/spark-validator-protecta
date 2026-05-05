@@ -60,7 +60,7 @@ WORKDIR /src
 COPY . /src
 
 # Establecer la variable de entorno STORAGE_PATH
-ENV STORAGE_PATH=/src/repositories
+ENV STORAGE_PATH=/data
 
 # Exponer los puertos necesarios
 EXPOSE 8080 8000 6379
